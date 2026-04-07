@@ -1,73 +1,44 @@
 package thesis.android.smart_scan.processor
 
-import android.content.Context
 import android.net.Uri
 import android.util.Log
-import thesis.android.smart_scan.config.AppConfig
+import thesis.android.smart_scan.model.Image
+import thesis.android.smart_scan.repository.ObjectBoxRepository
 import thesis.android.smart_scan.service.mlkit.LanguageIdentifyService
 import thesis.android.smart_scan.service.mlkit.OCRService
+import thesis.android.smart_scan.service.mlkit.TextEmbeddingService
 import thesis.android.smart_scan.service.mlkit.TranslateService
 
-class ImageProcessor(
-    context: Context,
-    config: AppConfig = AppConfig()
-) {
-    companion object {
-        private const val TAG = "ImageProcessor"
-    }
+object ImageProcessor {
 
-    private val ocrService = OCRService(context)
-    private val languageIdentifyService = LanguageIdentifyService()
-    private val translateService = TranslateService(config.userLanguage)
+    private const val TAG = "ImageProcessor"
 
-    fun process(uri: Uri) {
+    suspend fun process(uri: Uri) {
         Log.d(TAG, "Bắt đầu xử lý ảnh: $uri")
 
-        ocrService.recognizeFromUri(
-            imageUri = uri,
-            onSuccess = { text ->
-                Log.d(TAG, "OCR xong — ${text}")
-                if (text.isBlank()) {
-                    Log.w(TAG, "Ảnh không chứa văn bản, dừng xử lý.")
-                    return@recognizeFromUri
-                }
-                identifyThenTranslate(text)
-            },
-            onFailure = { e ->
-                Log.e(TAG, "Lỗi bước OCR", e)
-            }
-        )
-    }
+        val text = OCRService.recognizeFromUri(uri)
+        Log.d(TAG, "OCR xong — $text")
 
-    fun close() {
-        ocrService.close()
-        languageIdentifyService.close()
-        translateService.close()
-        Log.d(TAG, "ImageProcessor đã giải phóng tài nguyên.")
-    }
+        if (text.isBlank()) {
+            Log.w(TAG, "Ảnh không chứa văn bản, dừng xử lý.")
+            return
+        }
 
-    private fun identifyThenTranslate(text: String) {
-        languageIdentifyService.identify(
-            text = text,
-            onSuccess = { languageTag ->
-                Log.d(TAG, "Ngôn ngữ nhận dạng: $languageTag")
+        val textToEmbed = try {
+            val languageTag = LanguageIdentifyService.identify(text)
+            Log.d(TAG, "Ngôn ngữ nhận dạng: $languageTag")
+            val translated = TranslateService.translate(text, languageTag)
+            Log.i(TAG, "Dịch xong [$languageTag → en]: Gốc='$text', Dịch='$translated'")
+            translated
+        } catch (e: Exception) {
+            Log.w(TAG, "Nhận dạng ngôn ngữ thất bại, dùng văn bản gốc để embedding.", e)
+            text
+        }
 
-                translateService.translate(
-                    text = text,
-                    sourceLanguageTag = languageTag,
-                    onSuccess = { translatedText ->
-                        Log.i(TAG, "Dịch xong [$languageTag → en]:")
-                        Log.i(TAG, "  Gốc  : $text")
-                        Log.i(TAG, "  Dịch : $translatedText")
-                    },
-                    onFailure = { e ->
-                        Log.e(TAG, "Lỗi bước Translate", e)
-                    }
-                )
-            },
-            onFailure = { e ->
-                Log.e(TAG, "Lỗi bước LanguageIdentify", e)
-            }
-        )
+        val embedding = TextEmbeddingService.embedText(text)
+        Log.d(TAG, "Embedding xong — size=${embedding.size}")
+
+        ObjectBoxRepository.put(Image(uri = uri, embedding = embedding))
+        Log.d(TAG, "Đã lưu Image vào ObjectBox.")
     }
 }

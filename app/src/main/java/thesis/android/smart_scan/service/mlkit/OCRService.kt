@@ -6,41 +6,41 @@ import android.util.Log
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
-class OCRService(private val context: Context) {
+object OCRService {
 
-    companion object {
-        private const val TAG = "OCRService"
+    private const val TAG = "OCRService"
+
+    private lateinit var appContext: Context
+    private val recognizer by lazy {
+        TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     }
 
-    private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    fun init(context: Context) {
+        appContext = context.applicationContext
+    }
 
-    fun recognizeFromUri(
-        imageUri: Uri,
-        onSuccess: (text: String) -> Unit,
-        onFailure: (exception: Exception) -> Unit
-    ) {
-        val image: InputImage = try {
-            InputImage.fromFilePath(context, imageUri)
+    suspend fun recognizeFromUri(imageUri: Uri): String = suspendCancellableCoroutine { cont ->
+        val image = try {
+            InputImage.fromFilePath(appContext, imageUri)
         } catch (e: IOException) {
             Log.e(TAG, "Không thể đọc ảnh từ uri=$imageUri", e)
-            onFailure(e)
-            return
+            cont.resumeWithException(e)
+            return@suspendCancellableCoroutine
         }
 
         recognizer.process(image)
             .addOnSuccessListener { visionText ->
                 Log.d(TAG, "OCR thành công — ${visionText.text}")
-                onSuccess(visionText.text)
+                cont.resume(visionText.text)
             }
             .addOnFailureListener { e ->
                 Log.e(TAG, "OCR thất bại", e)
-                onFailure(e)
+                cont.resumeWithException(e)
             }
-    }
-
-    fun close() {
-        recognizer.close()
     }
 }

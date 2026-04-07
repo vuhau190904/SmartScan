@@ -24,7 +24,7 @@ class ScreenshotObserver(private val context: Context) : ContentObserver(handler
         }
     }
 
-    private val contentResolver   = context.contentResolver
+    private val contentResolver = context.contentResolver
     private val externalImagesUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 
     fun start() {

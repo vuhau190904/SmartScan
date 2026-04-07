@@ -8,125 +8,112 @@ import com.google.mlkit.nl.translate.TranslateRemoteModel
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
-class TranslateService(userLanguageCode: String) {
+object TranslateService {
 
-    companion object {
-        private const val TAG = "TranslateService"
-    }
+    private const val TAG = "TranslateService"
 
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val modelManager = RemoteModelManager.getInstance()
-
     private val downloadConditions = DownloadConditions.Builder().build()
+    private val translatorCache = ConcurrentHashMap<String, Translator>()
 
-    private val translatorCache = mutableMapOf<String, Translator>()
-
-    init {
-        ensureModelDownloaded(TranslateLanguage.ENGLISH)
+    fun init(userLanguageCode: String) {
+        serviceScope.launch {
+            try { ensureModelDownloaded(TranslateLanguage.ENGLISH) }
+            catch (e: Exception) { Log.w(TAG, "Tải model 'en' thất bại khi khởi tạo", e) }
+        }
         val userLang = TranslateLanguage.fromLanguageTag(userLanguageCode)
         if (userLang == null) {
             Log.w(TAG, "Không tìm thấy TranslateLanguage cho tag='$userLanguageCode'.")
-        } else if(userLang != TranslateLanguage.ENGLISH){
-            ensureModelDownloaded(userLang)
+        } else if (userLang != TranslateLanguage.ENGLISH) {
+            serviceScope.launch {
+                try { ensureModelDownloaded(userLang) }
+                catch (e: Exception) { Log.w(TAG, "Tải model '$userLang' thất bại khi khởi tạo", e) }
+            }
         }
     }
 
-    fun translate(
-        text: String,
-        sourceLanguageTag: String,
-        onSuccess: (translatedText: String) -> Unit,
-        onFailure: (exception: Exception) -> Unit
-    ) {
-        if (text.isBlank()) {
-            onSuccess("")
-            return
-        }
+    suspend fun translate(text: String, sourceLanguageTag: String): String {
+        if (text.isBlank()) return ""
 
         if (sourceLanguageTag == TranslateLanguage.ENGLISH) {
             Log.d(TAG, "Văn bản đã là tiếng Anh, bỏ qua dịch.")
-            onSuccess(text)
-            return
+            return text
         }
 
         val sourceLang = TranslateLanguage.fromLanguageTag(sourceLanguageTag)
-        if (sourceLang == null) {
-            onFailure(Exception("ML Kit không hỗ trợ dịch ngôn ngữ: $sourceLanguageTag"))
-            return
-        }
+            ?: throw Exception("ML Kit không hỗ trợ dịch ngôn ngữ: $sourceLanguageTag")
 
-        ensureModelDownloaded(
-            languageCode = sourceLang,
-            onReady = { doTranslate(sourceLang, text, onSuccess, onFailure) },
-            onError = onFailure
-        )
+        ensureModelDownloaded(sourceLang)
+        return doTranslate(sourceLang, text)
     }
 
-    fun close() {
-        translatorCache.values.forEach { it.close() }
-        translatorCache.clear()
-        Log.d(TAG, "TranslateService đã đóng.")
-    }
-
-    private fun doTranslate(
-        sourceLang: String,
-        text: String,
-        onSuccess: (String) -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        val translator = translatorCache.getOrPut(sourceLang) {
-            Translation.getClient(
-                TranslatorOptions.Builder()
-                    .setSourceLanguage(sourceLang)
-                    .setTargetLanguage(TranslateLanguage.ENGLISH)
-                    .build()
-            )
-        }
-
-        translator.downloadModelIfNeeded(downloadConditions)
-            .addOnSuccessListener {
-                translator.translate(text)
-                    .addOnSuccessListener { translated ->
-                        Log.d(TAG, "Dịch thành công [$sourceLang → en]: $translated")
-                        onSuccess(translated)
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e(TAG, "Dịch thất bại", e)
-                        onFailure(e)
-                    }
+    private suspend fun doTranslate(sourceLang: String, text: String): String =
+        suspendCancellableCoroutine { cont ->
+            val translator = translatorCache.getOrPut(sourceLang) {
+                Translation.getClient(
+                    TranslatorOptions.Builder()
+                        .setSourceLanguage(sourceLang)
+                        .setTargetLanguage(TranslateLanguage.ENGLISH)
+                        .build()
+                )
             }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "Tải model '$sourceLang' thất bại", e)
-                onFailure(e)
-            }
-    }
 
-    private fun ensureModelDownloaded(
-        languageCode: String,
-        onReady: (() -> Unit)? = null,
-        onError: ((Exception) -> Unit)? = null
-    ) {
-        val model = TranslateRemoteModel.Builder(languageCode).build()
-        modelManager.isModelDownloaded(model)
-            .addOnSuccessListener { isDownloaded ->
-                if (isDownloaded) {
-                    Log.d(TAG, "Model '$languageCode' đã có sẵn.")
-                    onReady?.invoke()
-                } else {
-                    Log.d(TAG, "Model '$languageCode' chưa có, đang tải...")
-                    modelManager.download(model, downloadConditions)
-                        .addOnSuccessListener {
-                            Log.d(TAG, "Model '$languageCode' tải xong.")
-                            onReady?.invoke()
+            translator.downloadModelIfNeeded(downloadConditions)
+                .addOnSuccessListener {
+                    translator.translate(text)
+                        .addOnSuccessListener { translated ->
+                            val result = translated ?: run {
+                                Log.w(TAG, "ML Kit trả về null, dùng text gốc: $text")
+                                text
+                            }
+                            Log.d(TAG, "Dịch thành công [$sourceLang → en]: $result")
+                            cont.resume(result)
                         }
                         .addOnFailureListener { e ->
-                            Log.e(TAG, "Tải model '$languageCode' thất bại", e)
-                            onError?.invoke(e)
+                            Log.e(TAG, "Dịch thất bại", e)
+                            cont.resumeWithException(e)
                         }
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "Kiểm tra model '$languageCode' thất bại", e)
-                onError?.invoke(e)
-            }
-    }
+                .addOnFailureListener { e ->
+                    Log.e(TAG, "Tải model '$sourceLang' thất bại", e)
+                    cont.resumeWithException(e)
+                }
+        }
+
+    private suspend fun ensureModelDownloaded(languageCode: String): Unit =
+        suspendCancellableCoroutine { cont ->
+            val model = TranslateRemoteModel.Builder(languageCode).build()
+            modelManager.isModelDownloaded(model)
+                .addOnSuccessListener { isDownloaded ->
+                    if (isDownloaded) {
+                        Log.d(TAG, "Model '$languageCode' đã có sẵn.")
+                        cont.resume(Unit)
+                    } else {
+                        Log.d(TAG, "Model '$languageCode' chưa có, đang tải...")
+                        modelManager.download(model, downloadConditions)
+                            .addOnSuccessListener {
+                                Log.d(TAG, "Model '$languageCode' tải xong.")
+                                cont.resume(Unit)
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e(TAG, "Tải model '$languageCode' thất bại", e)
+                                cont.resumeWithException(e)
+                            }
+                    }
+                }
+                .addOnFailureListener { e ->
+                    Log.e(TAG, "Kiểm tra model '$languageCode' thất bại", e)
+                    cont.resumeWithException(e)
+                }
+        }
 }

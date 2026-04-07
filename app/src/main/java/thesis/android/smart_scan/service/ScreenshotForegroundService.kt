@@ -55,7 +55,6 @@ class ScreenshotForegroundService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    // ─── Notification ─────────────────────────────────────────────────────────
 
     private fun buildNotification() = run {
         val manager = getSystemService(NotificationManager::class.java)
@@ -63,7 +62,7 @@ class ScreenshotForegroundService : Service() {
             NotificationChannel(
                 Constant.NOTIFICATION_CHANNEL_ID,
                 Constant.NOTIFICATION_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_LOW   // Không âm thanh, không pop-up
+                NotificationManager.IMPORTANCE_LOW
             )
         )
 
@@ -78,7 +77,7 @@ class ScreenshotForegroundService : Service() {
             .setContentText("Đang theo dõi ảnh mới trong nền...")
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(openApp)
-            .setOngoing(true)   // Không thể vuốt xóa
+            .setOngoing(true)
             .setSilent(true)
             .build()
     }
