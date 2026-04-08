@@ -17,20 +17,20 @@ object SearchProcessor {
             return emptyList()
         }
 
-        val queryToEmbed = try {
-            val languageTag = LanguageIdentifyService.identify(query)
-            Log.d(TAG, "Ngôn ngữ nhận dạng: $languageTag")
-            val translated = TranslateService.translate(query, languageTag)
-            Log.i(TAG, "Dịch xong [$languageTag → en]: Gốc='$query', Dịch='$translated'")
-            translated
-        } catch (e: Exception) {
-            Log.w(TAG, "Nhận dạng ngôn ngữ thất bại, dùng query gốc để tìm kiếm.", e)
-            query
-        }
+//        val queryToEmbed = try {
+//            val languageTag = LanguageIdentifyService.identify(query)
+//            Log.d(TAG, "Ngôn ngữ nhận dạng: $languageTag")
+//            val translated = TranslateService.translate(query, languageTag)
+//            Log.i(TAG, "Dịch xong [$languageTag → en]: Gốc='$query', Dịch='$translated'")
+//            translated
+//        } catch (e: Exception) {
+//            Log.w(TAG, "Nhận dạng ngôn ngữ thất bại, dùng query gốc để tìm kiếm.", e)
+//            query
+//        }
 
         val embedding = TextEmbeddingService.embedText(query)
         Log.d(TAG, "Embedding xong — size=${embedding.size}")
 
-        return ObjectBoxRepository.search(embedding, 10)
+        return ObjectBoxRepository.search(embedding, 10000)
     }
 }

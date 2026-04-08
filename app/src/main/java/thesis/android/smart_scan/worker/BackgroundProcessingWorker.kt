@@ -7,6 +7,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import thesis.android.smart_scan.processor.ImageProcessor
 import thesis.android.smart_scan.util.Constant
+import thesis.android.smart_scan.util.ImageEventBus
 
 class BackgroundProcessingWorker(
     context: Context,
@@ -27,6 +28,7 @@ class BackgroundProcessingWorker(
         return try {
             ImageProcessor.process(uri)
             Log.d(TAG, "Worker đã hoàn thành xử lý ảnh thành công.")
+            ImageEventBus.notifyNewImage()
             Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "Lỗi trong quá trình xử lý ngầm: ${e.message}", e)

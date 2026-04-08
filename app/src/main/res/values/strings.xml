@@ -1,14 +1,18 @@
 <resources>
     <string name="app_name">SmartScan</string>
-    <string name="search_hint">Tìm kiếm ảnh bằng nội dung...</string>
+    <string name="app_subtitle">Tìm kiếm ảnh thông minh</string>
+    <string name="search_hint">Tìm kiếm ảnh bằng nội dung…</string>
     <string name="search_button">Tìm</string>
     <string name="result_count">Tìm thấy %d ảnh</string>
     <string name="no_results">Không tìm thấy kết quả nào</string>
     <string name="all_images">%d ảnh đã lưu</string>
     <string name="no_indexed_images">Chưa có ảnh nào được lưu</string>
-    <string name="loading">Đang tìm kiếm...</string>
+    <string name="empty_subtitle">Ảnh sẽ xuất hiện ở đây sau khi được quét</string>
+    <string name="loading">Đang tìm kiếm…</string>
     <string name="back">Quay lại</string>
     <string name="date_added">Ngày thêm</string>
     <string name="file_size">Kích thước</string>
-    <string name="image_dimensions">Kích thước ảnh</string>
+    <string name="image_dimensions">Độ phân giải</string>
+    <string name="unknown">Không rõ</string>
+    <string name="page_counter">%1$d / %2$d</string>
 </resources>

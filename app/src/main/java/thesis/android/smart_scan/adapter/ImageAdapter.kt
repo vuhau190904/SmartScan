@@ -21,21 +21,34 @@ class ImageAdapter(
             override fun areItemsTheSame(oldItem: Uri, newItem: Uri) = oldItem == newItem
             override fun areContentsTheSame(oldItem: Uri, newItem: Uri) = oldItem == newItem
         }
+
+        private val STAGGER_HEIGHTS_DP = intArrayOf(130, 160, 120, 175, 140, 155, 125, 170)
     }
 
     inner class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val ivImage: ImageView = itemView.findViewById(R.id.ivImage)
+        val ivImage: ImageView = itemView.findViewById(R.id.ivImage)
 
-        fun bind(uri: Uri) {
+        fun bind(uri: Uri, position: Int) {
+            val density = itemView.context.resources.displayMetrics.density
+            val heightDp = STAGGER_HEIGHTS_DP[position % STAGGER_HEIGHTS_DP.size]
+            ivImage.layoutParams.height = (heightDp * density).toInt()
+
             Glide.with(itemView.context)
                 .load(uri)
                 .centerCrop()
-                .transition(DrawableTransitionOptions.withCrossFade(150))
+                .transition(DrawableTransitionOptions.withCrossFade(120))
                 .placeholder(R.drawable.ic_image_placeholder)
                 .into(ivImage)
 
             itemView.setOnClickListener { onItemClick(uri) }
         }
+    }
+
+    fun resetItems(uris: List<Uri>) = submitList(uris)
+
+    fun appendItems(newUris: List<Uri>) {
+        if (newUris.isEmpty()) return
+        submitList(currentList.toMutableList().apply { addAll(newUris) })
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
@@ -45,6 +58,11 @@ class ImageAdapter(
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), position)
+    }
+
+    override fun onViewRecycled(holder: ImageViewHolder) {
+        super.onViewRecycled(holder)
+        Glide.with(holder.itemView.context).clear(holder.ivImage)
     }
 }

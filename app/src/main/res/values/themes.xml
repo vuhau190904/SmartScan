@@ -4,6 +4,10 @@
         <item name="colorPrimaryContainer">@color/color_primary_container</item>
         <item name="colorOnPrimary">@color/color_on_primary</item>
         <item name="colorOnPrimaryContainer">@color/color_on_primary_container</item>
+        <item name="colorSecondary">@color/color_secondary</item>
+        <item name="colorSecondaryContainer">@color/color_secondary_container</item>
+        <item name="colorTertiary">@color/color_tertiary</item>
+        <item name="colorTertiaryContainer">@color/color_tertiary_container</item>
         <item name="android:colorBackground">@color/color_background</item>
         <item name="colorSurface">@color/color_surface</item>
         <item name="colorSurfaceVariant">@color/color_surface_variant</item>
@@ -12,6 +16,8 @@
         <item name="colorOutline">@color/color_outline</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/color_background</item>
     </style>
 
     <style name="Theme.MyApplication" parent="Base.Theme.MyApplication" />

@@ -24,16 +24,16 @@ object ImageProcessor {
             return
         }
 
-        val textToEmbed = try {
-            val languageTag = LanguageIdentifyService.identify(text)
-            Log.d(TAG, "Ngôn ngữ nhận dạng: $languageTag")
-            val translated = TranslateService.translate(text, languageTag)
-            Log.i(TAG, "Dịch xong [$languageTag → en]: Gốc='$text', Dịch='$translated'")
-            translated
-        } catch (e: Exception) {
-            Log.w(TAG, "Nhận dạng ngôn ngữ thất bại, dùng văn bản gốc để embedding.", e)
-            text
-        }
+//        val textToEmbed = try {
+//            val languageTag = LanguageIdentifyService.identify(text)
+//            Log.d(TAG, "Ngôn ngữ nhận dạng: $languageTag")
+//            val translated = TranslateService.translate(text, languageTag)
+//            Log.i(TAG, "Dịch xong [$languageTag → en]: Gốc='$text', Dịch='$translated'")
+//            translated
+//        } catch (e: Exception) {
+//            Log.w(TAG, "Nhận dạng ngôn ngữ thất bại, dùng văn bản gốc để embedding.", e)
+//            text
+//        }
 
         val embedding = TextEmbeddingService.embedText(text)
         Log.d(TAG, "Embedding xong — size=${embedding.size}")

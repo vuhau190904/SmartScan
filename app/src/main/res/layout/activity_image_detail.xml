@@ -2,247 +2,315 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/detailRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground">
+    android:background="#000000">
 
-    <androidx.core.widget.NestedScrollView
+    <!-- Full-screen image pager -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent" />
+
+    <!-- Top gradient scrim -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:background="@drawable/gradient_top" />
+
+    <!-- Top bar: back + page counter -->
+    <FrameLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp">
+
+        <!-- Back button -->
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="start|center_vertical"
+            android:background="@drawable/bg_circle_button"
+            android:src="@drawable/ic_arrow_back"
+            android:contentDescription="@string/back"
+            android:padding="9dp"
+            app:tint="@color/white" />
+
+        <!-- Page counter pill — e.g. "3 / 128" -->
+        <TextView
+            android:id="@+id/tvPageCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:background="@drawable/bg_page_counter"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="6dp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#EEFFFFFF"
+            android:textSize="13sp"
+            tools:text="3 / 128" />
+
+    </FrameLayout>
+
+    <!-- Bottom Sheet -->
+    <LinearLayout
+        android:id="@+id/bottomSheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_bottom_sheet"
+        android:backgroundTint="?attr/colorSurface"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="0dp"
+        app:behavior_draggable="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="14dp"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="32dp">
 
-            <!-- Image hero section -->
-            <FrameLayout
+            <!-- Drag handle -->
+            <View
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/bg_sheet_handle"
+                android:backgroundTint="?attr/colorOnSurfaceVariant"
+                android:alpha="0.35" />
+
+            <!-- File name -->
+            <TextView
+                android:id="@+id/tvDetailFileName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#000000">
+                android:layout_marginBottom="20dp"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="-0.01"
+                android:textColor="?attr/colorOnSurface"
+                android:maxLines="2"
+                android:ellipsize="end"
+                tools:text="screenshot_20240101_120000.jpg" />
 
-                <ImageView
-                    android:id="@+id/ivDetailImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="420dp"
-                    android:scaleType="fitCenter"
-                    android:adjustViewBounds="true"
-                    android:contentDescription="@null" />
-
-                <!-- Top gradient overlay -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:background="@drawable/gradient_top" />
-
-                <!-- Back button -->
-                <ImageButton
-                    android:id="@+id/btnBack"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_margin="16dp"
-                    android:background="@drawable/bg_circle_button"
-                    android:src="@drawable/ic_arrow_back"
-                    android:contentDescription="@string/back"
-                    android:padding="8dp"
-                    app:tint="@color/white" />
-
-            </FrameLayout>
-
-            <!-- Info section -->
-            <LinearLayout
+            <!-- Info rows in a card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="32dp">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant">
 
-                <!-- File name -->
-                <TextView
-                    android:id="@+id/tvDetailFileName"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:maxLines="2"
-                    android:ellipsize="end"
-                    android:layout_marginBottom="20dp"
-                    tools:text="screenshot_20240101_120000.jpg"
-                    xmlns:tools="http://schemas.android.com/tools" />
+                    android:orientation="vertical"
+                    android:padding="4dp">
 
-                <!-- Info card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="1dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="?attr/colorOutline"
-                    app:cardBackgroundColor="?attr/colorSurface">
-
+                    <!-- Date -->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:layout_height="60dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:paddingHorizontal="16dp">
 
-                        <!-- Date row -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="64dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/bg_icon_tint" />
 
                             <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
                                 android:src="@drawable/ic_calendar"
                                 app:tint="?attr/colorPrimary"
                                 android:contentDescription="@null" />
 
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="14dp"
-                                android:orientation="vertical">
+                        </FrameLayout>
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/date_added"
-                                    android:textSize="11sp"
-                                    android:letterSpacing="0.05"
-                                    android:textAllCaps="true"
-                                    android:textColor="?attr/colorOnSurfaceVariant" />
-
-                                <TextView
-                                    android:id="@+id/tvDetailDate"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:textSize="15sp"
-                                    android:textColor="?attr/colorOnSurface"
-                                    tools:text="01/01/2024 • 12:30"
-                                    xmlns:tools="http://schemas.android.com/tools" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <!-- Divider -->
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="?attr/colorOutline"
-                            android:alpha="0.3" />
-
-                        <!-- Size row -->
                         <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="64dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="14dp"
+                            android:orientation="vertical">
 
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/ic_storage"
-                                app:tint="?attr/colorPrimary"
-                                android:contentDescription="@null" />
-
-                            <LinearLayout
-                                android:layout_width="0dp"
+                            <TextView
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="14dp"
-                                android:orientation="vertical">
+                                android:text="@string/date_added"
+                                android:textSize="11sp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.06"
+                                android:textAllCaps="true"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/file_size"
-                                    android:textSize="11sp"
-                                    android:letterSpacing="0.05"
-                                    android:textAllCaps="true"
-                                    android:textColor="?attr/colorOnSurfaceVariant" />
-
-                                <TextView
-                                    android:id="@+id/tvDetailSize"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:textSize="15sp"
-                                    android:textColor="?attr/colorOnSurface"
-                                    tools:text="2.5 MB"
-                                    xmlns:tools="http://schemas.android.com/tools" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
-
-                        <!-- Divider -->
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="?attr/colorOutline"
-                            android:alpha="0.3" />
-
-                        <!-- Dimensions row -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="64dp"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <ImageView
-                                android:layout_width="22dp"
-                                android:layout_height="22dp"
-                                android:src="@drawable/ic_image_placeholder"
-                                app:tint="?attr/colorPrimary"
-                                android:contentDescription="@null" />
-
-                            <LinearLayout
-                                android:layout_width="0dp"
+                            <TextView
+                                android:id="@+id/tvDetailDate"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="14dp"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/image_dimensions"
-                                    android:textSize="11sp"
-                                    android:letterSpacing="0.05"
-                                    android:textAllCaps="true"
-                                    android:textColor="?attr/colorOnSurfaceVariant" />
-
-                                <TextView
-                                    android:id="@+id/tvDetailDimensions"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:textSize="15sp"
-                                    android:textColor="?attr/colorOnSurface"
-                                    tools:text="1080 × 1920 px"
-                                    xmlns:tools="http://schemas.android.com/tools" />
-
-                            </LinearLayout>
+                                android:layout_marginTop="2dp"
+                                android:textSize="15sp"
+                                android:fontFamily="sans-serif"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="01/01/2024 • 12:30" />
 
                         </LinearLayout>
 
                     </LinearLayout>
 
-                </com.google.android.material.card.MaterialCardView>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="?attr/colorOutline"
+                        android:alpha="0.2" />
 
-            </LinearLayout>
+                    <!-- File size -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/bg_icon_tint" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_storage"
+                                app:tint="?attr/colorPrimary"
+                                android:contentDescription="@null" />
+
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="14dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/file_size"
+                                android:textSize="11sp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.06"
+                                android:textAllCaps="true"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:id="@+id/tvDetailSize"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textSize="15sp"
+                                android:fontFamily="sans-serif"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="2.5 MB" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="?attr/colorOutline"
+                        android:alpha="0.2" />
+
+                    <!-- Dimensions -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@drawable/bg_icon_tint" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_image_placeholder"
+                                app:tint="?attr/colorPrimary"
+                                android:contentDescription="@null" />
+
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="14dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/image_dimensions"
+                                android:textSize="11sp"
+                                android:fontFamily="sans-serif-medium"
+                                android:letterSpacing="0.06"
+                                android:textAllCaps="true"
+                                android:textColor="?attr/colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:id="@+id/tvDetailDimensions"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textSize="15sp"
+                                android:fontFamily="sans-serif"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="1080 × 1920 px" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -43,15 +43,14 @@ object ObjectBoxRepository {
         return uries
     }
 
-    fun getAllUris(): List<Uri> {
-        return imageBox.all.map { it.uri }
+    fun getUrisPaged(offset: Long, limit: Long): List<Uri> {
+        return imageBox.query()
+            .orderDesc(Image_.id)
+            .build()
+            .find(offset, limit)
+            .map { it.uri }
     }
 
-    fun getAll() {
-        val results = imageBox.all
-        for (result in results) {
-            Log.i(TAG, result.toString())
-        }
-    }
+    fun count(): Long = imageBox.count()
 
 }
