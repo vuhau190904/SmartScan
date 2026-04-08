@@ -11,8 +11,6 @@ import android.util.Log
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import thesis.android.smart_scan.config.AppConfig
-import thesis.android.smart_scan.processor.ImageProcessor
 import thesis.android.smart_scan.util.Constant
 
 class ScreenshotObserver(private val context: Context) : ContentObserver(handler) {
