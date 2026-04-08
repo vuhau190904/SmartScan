@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import thesis.android.smart_scan.model.Image
 import thesis.android.smart_scan.repository.ObjectBoxRepository
+import thesis.android.smart_scan.service.mlkit.ImageDescriptionService
 import thesis.android.smart_scan.service.mlkit.LanguageIdentifyService
 import thesis.android.smart_scan.service.mlkit.OCRService
 import thesis.android.smart_scan.service.mlkit.TextEmbeddingService
@@ -35,7 +36,10 @@ object ImageProcessor {
 //            text
 //        }
 
-        val embedding = TextEmbeddingService.embedText(text)
+        val description = ImageDescriptionService.describeImage(uri)
+        Log.d(TAG, "Mô tả ảnh: ${description.getOrNull()}")
+
+        val embedding = TextEmbeddingService.embedText("$text | $description")
         Log.d(TAG, "Embedding xong — size=${embedding.size}")
 
         ObjectBoxRepository.put(Image(uri = uri, embedding = embedding))

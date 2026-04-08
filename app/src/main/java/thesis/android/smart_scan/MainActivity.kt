@@ -31,6 +31,7 @@ import thesis.android.smart_scan.processor.SearchProcessor
 import thesis.android.smart_scan.repository.MediaContentRepository
 import thesis.android.smart_scan.repository.ObjectBoxRepository
 import thesis.android.smart_scan.service.ScreenshotForegroundService
+import thesis.android.smart_scan.service.mlkit.ImageDescriptionService
 import thesis.android.smart_scan.service.mlkit.OCRService
 import thesis.android.smart_scan.service.mlkit.TextEmbeddingService
 import thesis.android.smart_scan.service.mlkit.TranslateService
@@ -81,8 +82,10 @@ class MainActivity : AppCompatActivity() {
         applyWindowInsets()
 
         requestPermission()
-        initServices()
-        ScreenshotForegroundService.start(this)
+        lifecycleScope.launch {
+            initServices()
+            ScreenshotForegroundService.start(this@MainActivity)
+        }
 
         bindViews()
         setupRecyclerView()
@@ -298,12 +301,13 @@ class MainActivity : AppCompatActivity() {
 
     // ── System ─────────────────────────────────────────────────────────────
 
-    private fun initServices() {
+    private suspend fun initServices() {
         ObjectBoxRepository.init(this)
         MediaContentRepository.init(this)
         OCRService.init(this)
         TextEmbeddingService.init(this)
         TranslateService.init(Locale.getDefault().language)
+        ImageDescriptionService.init(this)
     }
 
     private fun hideKeyboard() {
