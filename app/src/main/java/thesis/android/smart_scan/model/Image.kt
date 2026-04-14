@@ -15,7 +15,13 @@ data class Image(
     @Convert(converter = UriConverter::class, dbType = String::class)
     var uri: Uri,
     @HnswIndex(dimensions = 100, distanceType = VectorDistanceType.COSINE)
-    var embedding: FloatArray
+    var embeddingOCR: FloatArray,
+
+    @HnswIndex(dimensions = 100, distanceType = VectorDistanceType.COSINE)
+    var embeddingDescription: FloatArray? = null,
+    var ocrText: String = "",
+    var imageDescription: String? = null,
+    var note: String? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -25,15 +31,23 @@ data class Image(
 
         if (id != other.id) return false
         if (uri != other.uri) return false
-        if (!embedding.contentEquals(other.embedding)) return false
+        if (!embeddingOCR.contentEquals(other.embeddingOCR)) return false
+        if (!embeddingDescription.contentEquals(other.embeddingDescription)) return false
+        if (ocrText != other.ocrText) return false
+        if (imageDescription != other.imageDescription) return false
+        if (note != other.note) return false
 
         return true
     }
 
     override fun hashCode(): Int {
         var result = id.hashCode()
-        result = 31 * result + (uri?.hashCode() ?: 0)
-        result = 31 * result + (embedding?.contentHashCode() ?: 0)
+        result = 31 * result + uri.hashCode()
+        result = 31 * result + embeddingOCR.contentHashCode()
+        result = 31 * result + embeddingDescription.contentHashCode()
+        result = 31 * result + ocrText.hashCode()
+        result = 31 * result + (imageDescription?.hashCode() ?: 0)
+        result = 31 * result + (note?.hashCode() ?: 0)
         return result
     }
 }

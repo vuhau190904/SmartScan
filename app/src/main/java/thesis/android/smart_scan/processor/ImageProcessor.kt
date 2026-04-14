@@ -17,10 +17,10 @@ object ImageProcessor {
     suspend fun process(uri: Uri) {
         Log.d(TAG, "Bắt đầu xử lý ảnh: $uri")
 
-        val text = OCRService.recognizeFromUri(uri)
-        Log.d(TAG, "OCR xong — $text")
+        val textOCR = OCRService.recognizeFromUri(uri)
+        Log.d(TAG, "OCR xong — $textOCR")
 
-        if (text.isBlank()) {
+        if (textOCR.isBlank()) {
             Log.w(TAG, "Ảnh không chứa văn bản, dừng xử lý.")
             return
         }
@@ -37,12 +37,23 @@ object ImageProcessor {
 //        }
 
         val description = ImageDescriptionService.describeImage(uri)
-        Log.d(TAG, "Mô tả ảnh: ${description.getOrNull()}")
+        val descriptionText = description.getOrNull()?.trim().orEmpty()
+        Log.d(TAG, "Mô tả ảnh: $descriptionText")
 
-        val embedding = TextEmbeddingService.embedText("$text | $description")
-        Log.d(TAG, "Embedding xong — size=${embedding.size}")
+        val embeddingOCR = TextEmbeddingService.embedText(textOCR)
+        Log.d(TAG, "Embedding xong — size=${embeddingOCR.size}")
 
-        ObjectBoxRepository.put(Image(uri = uri, embedding = embedding))
+        val embeddingDescription = descriptionText.takeIf { it.isNotBlank() }?.let {
+            TextEmbeddingService.embedText(it)
+        }
+
+        ObjectBoxRepository.put(Image(
+            uri = uri,
+            embeddingOCR = embeddingOCR,
+            embeddingDescription = embeddingDescription,
+            ocrText = textOCR.trim(),
+            imageDescription = descriptionText.ifBlank { null }
+        ))
         Log.d(TAG, "Đã lưu Image vào ObjectBox.")
     }
 }

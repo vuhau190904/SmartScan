@@ -4,10 +4,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.View
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
@@ -18,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import thesis.android.smart_scan.adapter.DetailImagePagerAdapter
 import thesis.android.smart_scan.repository.MediaContentRepository
+import thesis.android.smart_scan.repository.ObjectBoxRepository
 import thesis.android.smart_scan.util.Constant
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -40,7 +44,15 @@ class ImageDetailActivity : AppCompatActivity() {
     private lateinit var tvDate: TextView
     private lateinit var tvSize: TextView
     private lateinit var tvDimensions: TextView
+    private lateinit var tvOcrLabel: TextView
+    private lateinit var tvOcrText: TextView
+    private lateinit var tvDescriptionLabel: TextView
+    private lateinit var tvImageDescription: TextView
+    private lateinit var tvNoteLabel: TextView
+    private lateinit var etNote: EditText
+    private lateinit var btnSaveNote: com.google.android.material.button.MaterialButton
     private lateinit var tvPageCounter: TextView
+    private var currentUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +91,20 @@ class ImageDetailActivity : AppCompatActivity() {
         tvDate = findViewById(R.id.tvDetailDate)
         tvSize = findViewById(R.id.tvDetailSize)
         tvDimensions = findViewById(R.id.tvDetailDimensions)
+        tvOcrLabel = findViewById(R.id.tvOcrLabel)
+        tvOcrText = findViewById(R.id.tvDetailOcrText)
+        tvDescriptionLabel = findViewById(R.id.tvDescriptionLabel)
+        tvImageDescription = findViewById(R.id.tvDetailImageDescription)
+        tvNoteLabel = findViewById(R.id.tvNoteLabel)
+        etNote = findViewById(R.id.etDetailNote)
+        btnSaveNote = findViewById(R.id.btnSaveNote)
         tvPageCounter = findViewById(R.id.tvPageCounter)
+
+        btnSaveNote.setOnClickListener {
+            val uri = currentUri ?: return@setOnClickListener
+            ObjectBoxRepository.updateNoteByUri(uri, etNote.text?.toString()?.trim())
+            Toast.makeText(this, getString(R.string.note_saved), Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupViewPager(uris: List<Uri>, startPosition: Int) {
@@ -149,6 +174,8 @@ class ImageDetailActivity : AppCompatActivity() {
     }
 
     private fun updateMetadata(uri: Uri) {
+        currentUri = uri
+        val indexedImage = ObjectBoxRepository.getByUri(uri)
         val info = MediaContentRepository.getImageDetails(uri)
         if (info != null) {
             tvFileName.text = info.displayName
@@ -167,6 +194,21 @@ class ImageDetailActivity : AppCompatActivity() {
             tvSize.text = unknown
             tvDimensions.text = unknown
         }
+
+        val ocrText = indexedImage?.ocrText?.takeIf { it.isNotBlank() }
+        val imageDescription = indexedImage?.imageDescription?.takeIf { it.isNotBlank() }
+
+        tvOcrLabel.visibility = if (ocrText != null) View.VISIBLE else View.GONE
+        tvOcrText.visibility = if (ocrText != null) View.VISIBLE else View.GONE
+        tvOcrText.text = ocrText.orEmpty()
+
+        tvDescriptionLabel.visibility =
+            if (imageDescription != null) View.VISIBLE else View.GONE
+        tvImageDescription.visibility =
+            if (imageDescription != null) View.VISIBLE else View.GONE
+        tvImageDescription.text = imageDescription.orEmpty()
+
+        etNote.setText(indexedImage?.note.orEmpty())
     }
 
     private fun preloadAround(uris: List<Uri>, center: Int) {

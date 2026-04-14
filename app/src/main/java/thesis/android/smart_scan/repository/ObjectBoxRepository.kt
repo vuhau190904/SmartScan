@@ -27,20 +27,39 @@ object ObjectBoxRepository {
         imageBox.put(image)
     }
 
-    fun search(embedding: FloatArray, limit: Int): MutableList<Uri> {
-        val uries: MutableList<Uri> = mutableListOf()
-        val query = imageBox.query(Image_.embedding.nearestNeighbors(embedding, limit)).build()
-        val results: List<ObjectWithScore<Image>> = query.findWithScores()
+    fun getByUri(uri: Uri): Image? {
+        return imageBox.all.firstOrNull { it.uri == uri }
+    }
 
-        for (result in results) {
-            val image = result.get()
-            val score = result.score
-            if(score <= 0.3) {
-                uries.add(image.uri)
+    fun updateNoteByUri(uri: Uri, note: String?) {
+        val image = getByUri(uri) ?: return
+        image.note = note?.takeIf { it.isNotBlank() }
+        imageBox.put(image)
+    }
+
+    fun search(queryVector: FloatArray, limit: Int): List<Uri> {
+        val queryOCR = imageBox.query()
+            .nearestNeighbors(Image_.embeddingOCR, queryVector, limit)
+            .build()
+
+        val queryDesc = imageBox.query()
+            .nearestNeighbors(Image_.embeddingDescription, queryVector, limit)
+            .build()
+
+        val finalUris = (queryOCR.findWithScores() + queryDesc.findWithScores())
+            .filter { it.score <= 0.3 }
+            .groupBy { it.get().id }
+            .map { (_, results) ->
+                results.minBy { it.score }
             }
-        }
-        query.close()
-        return uries
+            .sortedBy { it.score }
+            .take(limit)
+            .mapNotNull { it.get().uri }
+
+        queryOCR.close()
+        queryDesc.close()
+
+        return finalUris
     }
 
     fun getUrisPaged(offset: Long, limit: Long): List<Uri> {

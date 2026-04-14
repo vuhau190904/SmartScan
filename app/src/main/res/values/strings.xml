@@ -13,6 +13,12 @@
     <string name="date_added">Ngày thêm</string>
     <string name="file_size">Kích thước</string>
     <string name="image_dimensions">Độ phân giải</string>
+    <string name="ocr_text">Văn bản OCR</string>
+    <string name="image_description">Mô tả ảnh</string>
+    <string name="note">Ghi chú</string>
+    <string name="note_hint">Nhập ghi chú cho ảnh này</string>
+    <string name="save_note">Lưu ghi chú</string>
+    <string name="note_saved">Đã lưu ghi chú</string>
     <string name="unknown">Không rõ</string>
     <string name="page_counter">%1$d / %2$d</string>
 </resources>
