@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardCollection"
+    android:layout_width="156dp"
+    android:layout_height="132dp"
+    android:layout_marginHorizontal="6dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tvCollectionName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <FrameLayout
+            android:layout_width="116dp"
+            android:layout_height="76dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginBottom="2dp">
+
+            <ImageView
+                android:id="@+id/ivPreviewBack"
+                android:layout_width="76dp"
+                android:layout_height="56dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="8dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_collection_preview"
+                android:clipToOutline="true"
+                android:rotation="7"
+                android:elevation="1dp"
+                android:contentDescription="@null" />
+
+            <ImageView
+                android:id="@+id/ivPreviewMiddle"
+                android:layout_width="78dp"
+                android:layout_height="58dp"
+                android:layout_marginStart="14dp"
+                android:layout_marginTop="4dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_collection_preview"
+                android:clipToOutline="true"
+                android:elevation="2dp"
+                android:contentDescription="@null" />
+
+            <ImageView
+                android:id="@+id/ivPreviewFront"
+                android:layout_width="82dp"
+                android:layout_height="60dp"
+                android:layout_marginTop="12dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/bg_collection_preview"
+                android:clipToOutline="true"
+                android:rotation="-5"
+                android:elevation="3dp"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvCountBadge"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:background="@drawable/bg_collection_count_badge"
+            android:textColor="@android:color/white"
+            android:textSize="11sp"
+            android:fontFamily="sans-serif-medium" />
+
+    </FrameLayout>
+
+</com.google.android.material.card.MaterialCardView>

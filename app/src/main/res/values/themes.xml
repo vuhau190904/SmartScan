@@ -18,7 +18,27 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@color/color_background</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.SmartScan.MaterialAlertDialog</item>
     </style>
 
     <style name="Theme.MyApplication" parent="Base.Theme.MyApplication" />
+
+    <!-- Material Alert: bo góc lớn, nút kiểu chữ, bớt “mặc định Android cũ” -->
+    <style name="ThemeOverlay.SmartScan.MaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.SmartScan.AlertDialog</item>
+    </style>
+
+    <style name="ShapeAppearance.SmartScan.AlertDialog" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSize">22dp</item>
+    </style>
+
+    <style name="Widget.SmartScan.TextInput.Note" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="boxBackgroundMode">filled</item>
+        <item name="boxCornerRadiusTopStart">14dp</item>
+        <item name="boxCornerRadiusTopEnd">14dp</item>
+        <item name="boxCornerRadiusBottomStart">14dp</item>
+        <item name="boxCornerRadiusBottomEnd">14dp</item>
+    </style>
 </resources>

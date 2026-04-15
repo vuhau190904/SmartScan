@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.textfield.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialogTextInputLayout"
+    style="@style/Widget.Material3.TextInputLayout.FilledBox"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="2dp"
+    app:boxBackgroundMode="filled"
+    app:boxCornerRadiusBottomEnd="16dp"
+    app:boxCornerRadiusBottomStart="16dp"
+    app:boxCornerRadiusTopEnd="16dp"
+    app:boxCornerRadiusTopStart="16dp"
+    app:boxStrokeWidth="0dp"
+    app:boxStrokeWidthFocused="0dp">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/dialogEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:inputType="text|textCapSentences"
+        android:maxLines="4"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="16sp" />
+
+</com.google.android.material.textfield.TextInputLayout>

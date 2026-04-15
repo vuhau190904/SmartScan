@@ -1,5 +1,6 @@
 package thesis.android.smart_scan
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Rect
 import android.net.Uri
@@ -11,22 +12,30 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import thesis.android.smart_scan.adapter.CollectionCardAdapter
+import thesis.android.smart_scan.adapter.CollectionCardItem
 import thesis.android.smart_scan.adapter.ImageAdapter
+import thesis.android.smart_scan.model.ImageCollection
 import thesis.android.smart_scan.processor.SearchProcessor
 import thesis.android.smart_scan.repository.MediaContentRepository
 import thesis.android.smart_scan.repository.ObjectBoxRepository
@@ -36,6 +45,7 @@ import thesis.android.smart_scan.service.mlkit.OCRService
 import thesis.android.smart_scan.service.mlkit.TextEmbeddingService
 import thesis.android.smart_scan.service.mlkit.TranslateService
 import thesis.android.smart_scan.util.Constant
+import thesis.android.smart_scan.util.inflateDialogTextInput
 import thesis.android.smart_scan.util.ImageEventBus
 import java.util.Locale
 
@@ -46,13 +56,18 @@ class MainActivity : AppCompatActivity() {
         private const val PREFETCH_DISTANCE = 8
         private const val SEARCH_DEBOUNCE_MS = 400L
         private const val GRID_SPAN_COUNT = 3
-        private const val GRID_SPACING_DP = 4
+        private const val GRID_SPACING_DP = 6
     }
 
     // ── Views ──────────────────────────────────────────────────────────────
 
     private lateinit var etSearch: EditText
     private lateinit var tvResultCount: TextView
+    private lateinit var collectionHeader: View
+    private lateinit var screenshotsSectionHeader: View
+    private lateinit var rvCollections: RecyclerView
+    private lateinit var btnAddCollection: ImageButton
+    private lateinit var collectionCardAdapter: CollectionCardAdapter
     private lateinit var rvImages: RecyclerView
     private lateinit var progressBar: LinearProgressIndicator
     private lateinit var layoutEmpty: LinearLayout
@@ -73,6 +88,15 @@ class MainActivity : AppCompatActivity() {
     private var searchResultsCache: List<Uri> = emptyList()
     private var searchPageOffset = 0
 
+    private val imageDetailLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            refreshCurrentView()
+            renderCollections()
+        }
+    }
+
     // ── Lifecycle ──────────────────────────────────────────────────────────
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,10 +112,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         bindViews()
+        setupCollectionsRecyclerView()
         setupRecyclerView()
         setupSearch()
+        setupCollectionActions()
 
         loadFirstPage()
+        renderCollections()
         observeNewImages()
     }
 
@@ -113,20 +140,38 @@ class MainActivity : AppCompatActivity() {
     private fun bindViews() {
         etSearch = findViewById(R.id.etSearch)
         tvResultCount = findViewById(R.id.tvResultCount)
+        collectionHeader = findViewById(R.id.collectionHeader)
+        screenshotsSectionHeader = findViewById(R.id.screenshotsSectionHeader)
+        rvCollections = findViewById(R.id.rvCollections)
+        btnAddCollection = findViewById(R.id.btnAddCollection)
         rvImages = findViewById(R.id.rvImages)
         progressBar = findViewById(R.id.progressBar)
         layoutEmpty = findViewById(R.id.layoutEmpty)
         tvEmptyMessage = findViewById(R.id.tvEmptyMessage)
     }
 
+    private fun setupCollectionsRecyclerView() {
+        collectionCardAdapter = CollectionCardAdapter { collection ->
+            val intent = Intent(this, CollectionDetailActivity::class.java).apply {
+                putExtra(Constant.COLLECTION_ID, collection.id)
+                putExtra(Constant.COLLECTION_NAME, collection.name)
+            }
+            imageDetailLauncher.launch(intent)
+        }
+        rvCollections.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
+            adapter = collectionCardAdapter
+        }
+    }
+
+    private fun setupCollectionActions() {
+        btnAddCollection.setOnClickListener { showCreateCollectionDialog() }
+    }
+
     private fun setupRecyclerView() {
         imageAdapter = ImageAdapter { uri -> openImageDetail(uri) }
 
-        val layoutManager = StaggeredGridLayoutManager(
-            GRID_SPAN_COUNT, StaggeredGridLayoutManager.VERTICAL
-        ).apply {
-            gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS
-        }
+        val layoutManager = GridLayoutManager(this, GRID_SPAN_COUNT)
 
         val spacingPx = (GRID_SPACING_DP * resources.displayMetrics.density).toInt()
 
@@ -146,8 +191,10 @@ class MainActivity : AppCompatActivity() {
                 searchJob?.cancel()
                 val query = s?.toString()?.trim().orEmpty()
                 if (query.isEmpty()) {
+                    setCollectionsVisible(true)
                     resetAndLoadAll()
                 } else {
+                    setCollectionsVisible(false)
                     searchJob = lifecycleScope.launch {
                         delay(SEARCH_DEBOUNCE_MS)
                         performSearch(query)
@@ -161,7 +208,13 @@ class MainActivity : AppCompatActivity() {
                 searchJob?.cancel()
                 val query = etSearch.text.toString().trim()
                 hideKeyboard()
-                if (query.isEmpty()) resetAndLoadAll() else performSearch(query)
+                if (query.isEmpty()) {
+                    setCollectionsVisible(true)
+                    resetAndLoadAll()
+                } else {
+                    setCollectionsVisible(false)
+                    performSearch(query)
+                }
                 true
             } else false
         }
@@ -178,8 +231,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refreshCurrentView() {
-        if (isSearchMode && currentQuery.isNotBlank()) performSearch(currentQuery)
-        else loadFirstPage()
+        if (isSearchMode && currentQuery.isNotBlank()) {
+            performSearch(currentQuery)
+        } else {
+            loadFirstPage()
+        }
     }
 
     // ── Browse pagination ──────────────────────────────────────────────────
@@ -228,12 +284,13 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val allResults = SearchProcessor.search(query)
             showLoading(false)
-            searchResultsCache = allResults
-            val firstPage = allResults.take(PAGE_SIZE.toInt())
+            val filteredResults = allResults
+            searchResultsCache = filteredResults
+            val firstPage = filteredResults.take(PAGE_SIZE.toInt())
             searchPageOffset = firstPage.size
-            isLastPage = searchPageOffset >= allResults.size
+            isLastPage = searchPageOffset >= filteredResults.size
             imageAdapter.resetItems(firstPage)
-            updateSearchUI(allResults.size)
+            updateSearchUI(filteredResults.size)
         }
     }
 
@@ -252,6 +309,7 @@ class MainActivity : AppCompatActivity() {
         currentQuery = ""
         searchResultsCache = emptyList()
         searchPageOffset = 0
+        setCollectionsVisible(true)
         loadFirstPage()
     }
 
@@ -293,7 +351,7 @@ class MainActivity : AppCompatActivity() {
     private fun openImageDetail(uri: Uri) {
         val list = imageAdapter.currentList
         val position = list.indexOf(uri).coerceAtLeast(0)
-        startActivity(Intent(this, ImageDetailActivity::class.java).apply {
+        imageDetailLauncher.launch(Intent(this, ImageDetailActivity::class.java).apply {
             putStringArrayListExtra(Constant.IMAGE_URIS, ArrayList(list.map { it.toString() }))
             putExtra(Constant.IMAGE_POSITION, position)
         })
@@ -323,6 +381,52 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun renderCollections() {
+        val collections = ObjectBoxRepository.getAllCollections()
+        val cardItems = collections.map { collection ->
+            CollectionCardItem(
+                collection = collection,
+                imageCount = ObjectBoxRepository.getImageIdsInCollection(collection.id).size,
+                previewUris = ObjectBoxRepository.getCollectionPreviewUris(collection.id, 3)
+            )
+        }
+        collectionCardAdapter.submitItems(cardItems)
+    }
+
+    private fun showCreateCollectionDialog() {
+        val (inputView, input) = inflateDialogTextInput(getString(R.string.collection_name_hint))
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.create_collection))
+            .setView(inputView)
+            .setPositiveButton(getString(R.string.create)) { _, _ ->
+                val collection = ObjectBoxRepository.createCollection(input.text?.toString().orEmpty())
+                if (collection == null) {
+                    Toast.makeText(this, getString(R.string.invalid_collection_name), Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                renderCollections()
+                refreshCurrentView()
+                openCollectionDetail(collection)
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
+    }
+
+    private fun setCollectionsVisible(visible: Boolean) {
+        val state = if (visible) View.VISIBLE else View.GONE
+        collectionHeader.visibility = state
+        rvCollections.visibility = state
+        screenshotsSectionHeader.visibility = state
+    }
+
+    private fun openCollectionDetail(collection: ImageCollection) {
+        val intent = Intent(this, CollectionDetailActivity::class.java).apply {
+            putExtra(Constant.COLLECTION_ID, collection.id)
+            putExtra(Constant.COLLECTION_NAME, collection.name)
+        }
+        imageDetailLauncher.launch(intent)
+    }
+
     // ── Inner classes ──────────────────────────────────────────────────────
 
     private class UniformSpacingDecoration(
@@ -336,8 +440,8 @@ class MainActivity : AppCompatActivity() {
     private inner class PaginationScrollListener : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             if (dy <= 0 || isLoadingMore || isLastPage) return
-            val lm = recyclerView.layoutManager as StaggeredGridLayoutManager
-            val lastVisible = lm.findLastVisibleItemPositions(null).maxOrNull() ?: return
+            val lm = recyclerView.layoutManager as GridLayoutManager
+            val lastVisible = lm.findLastVisibleItemPosition()
             if (lastVisible >= lm.itemCount - PREFETCH_DISTANCE) {
                 if (isSearchMode) loadMoreSearchResults() else loadMoreImages()
             }

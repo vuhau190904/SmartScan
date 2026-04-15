@@ -52,7 +52,8 @@ object ImageProcessor {
             embeddingOCR = embeddingOCR,
             embeddingDescription = embeddingDescription,
             ocrText = textOCR.trim(),
-            imageDescription = descriptionText.ifBlank { null }
+            imageDescription = descriptionText.ifBlank { null },
+            updatedAt = System.currentTimeMillis()
         ))
         Log.d(TAG, "Đã lưu Image vào ObjectBox.")
     }
