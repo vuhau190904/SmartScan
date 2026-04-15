@@ -21,18 +21,12 @@ class ImageAdapter(
             override fun areItemsTheSame(oldItem: Uri, newItem: Uri) = oldItem == newItem
             override fun areContentsTheSame(oldItem: Uri, newItem: Uri) = oldItem == newItem
         }
-
-        private val STAGGER_HEIGHTS_DP = intArrayOf(130, 160, 120, 175, 140, 155, 125, 170)
     }
 
     inner class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ivImage: ImageView = itemView.findViewById(R.id.ivImage)
 
-        fun bind(uri: Uri, position: Int) {
-            val density = itemView.context.resources.displayMetrics.density
-            val heightDp = STAGGER_HEIGHTS_DP[position % STAGGER_HEIGHTS_DP.size]
-            ivImage.layoutParams.height = (heightDp * density).toInt()
-
+        fun bind(uri: Uri) {
             Glide.with(itemView.context)
                 .load(uri)
                 .centerCrop()
@@ -58,7 +52,7 @@ class ImageAdapter(
     }
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        holder.bind(getItem(position), position)
+        holder.bind(getItem(position))
     }
 
     override fun onViewRecycled(holder: ImageViewHolder) {

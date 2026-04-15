@@ -18,11 +18,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import thesis.android.smart_scan.model.ImageCollection
 import thesis.android.smart_scan.adapter.DetailImagePagerAdapter
 import thesis.android.smart_scan.repository.MediaContentRepository
 import thesis.android.smart_scan.repository.ObjectBoxRepository
 import thesis.android.smart_scan.util.Constant
+import thesis.android.smart_scan.util.inflateDialogTextInput
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -48,9 +54,10 @@ class ImageDetailActivity : AppCompatActivity() {
     private lateinit var tvOcrText: TextView
     private lateinit var tvDescriptionLabel: TextView
     private lateinit var tvImageDescription: TextView
-    private lateinit var tvNoteLabel: TextView
     private lateinit var etNote: EditText
-    private lateinit var btnSaveNote: com.google.android.material.button.MaterialButton
+    private lateinit var btnSaveNote: MaterialButton
+    private lateinit var chipGroupImageCollections: ChipGroup
+    private lateinit var btnAddImageToCollection: MaterialButton
     private lateinit var tvPageCounter: TextView
     private var currentUri: Uri? = null
 
@@ -95,15 +102,21 @@ class ImageDetailActivity : AppCompatActivity() {
         tvOcrText = findViewById(R.id.tvDetailOcrText)
         tvDescriptionLabel = findViewById(R.id.tvDescriptionLabel)
         tvImageDescription = findViewById(R.id.tvDetailImageDescription)
-        tvNoteLabel = findViewById(R.id.tvNoteLabel)
         etNote = findViewById(R.id.etDetailNote)
         btnSaveNote = findViewById(R.id.btnSaveNote)
+        chipGroupImageCollections = findViewById(R.id.chipGroupImageCollections)
+        btnAddImageToCollection = findViewById(R.id.btnAddImageToCollection)
         tvPageCounter = findViewById(R.id.tvPageCounter)
 
         btnSaveNote.setOnClickListener {
             val uri = currentUri ?: return@setOnClickListener
             ObjectBoxRepository.updateNoteByUri(uri, etNote.text?.toString()?.trim())
             Toast.makeText(this, getString(R.string.note_saved), Toast.LENGTH_SHORT).show()
+        }
+
+        btnAddImageToCollection.setOnClickListener {
+            val image = currentUri?.let { uri -> ObjectBoxRepository.getByUri(uri) } ?: return@setOnClickListener
+            showAddToCollectionDialog(image.id)
         }
     }
 
@@ -209,6 +222,75 @@ class ImageDetailActivity : AppCompatActivity() {
         tvImageDescription.text = imageDescription.orEmpty()
 
         etNote.setText(indexedImage?.note.orEmpty())
+        renderCollectionChips(indexedImage?.id ?: 0L)
+    }
+
+    private fun renderCollectionChips(imageId: Long) {
+        chipGroupImageCollections.removeAllViews()
+        if (imageId == 0L) return
+        val collections = ObjectBoxRepository.getCollectionsForImage(imageId)
+        collections.forEach { collection ->
+            val chip = Chip(this).apply {
+                text = collection.name
+                isCloseIconVisible = true
+                setOnCloseIconClickListener {
+                    ObjectBoxRepository.removeImageFromCollection(imageId, collection.id)
+                    renderCollectionChips(imageId)
+                    setResult(RESULT_OK)
+                }
+            }
+            chipGroupImageCollections.addView(chip)
+        }
+    }
+
+    private fun showAddToCollectionDialog(imageId: Long) {
+        val existingCollectionIds = ObjectBoxRepository.getCollectionsForImage(imageId).map { it.id }.toSet()
+        val availableCollections = ObjectBoxRepository.getAllCollections()
+            .filterNot { it.id in existingCollectionIds }
+        val options = buildList {
+            add(getString(R.string.create_collection_with_plus))
+            addAll(availableCollections.map(ImageCollection::name))
+        }.toTypedArray()
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.add_to_collection))
+            .setItems(options) { _, which ->
+                if (which == 0) {
+                    showCreateCollectionAndAddImageDialog(imageId)
+                    return@setItems
+                }
+                val selected = availableCollections.getOrNull(which - 1) ?: return@setItems
+                addImageToCollectionAndRefresh(imageId, selected.id)
+            }
+            .show()
+    }
+
+    private fun showCreateCollectionAndAddImageDialog(imageId: Long) {
+        val (inputView, input) = inflateDialogTextInput(getString(R.string.collection_name_hint))
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.create_collection))
+            .setView(inputView)
+            .setPositiveButton(getString(R.string.create)) { _, _ ->
+                val created = ObjectBoxRepository.createCollection(input.text?.toString().orEmpty())
+                if (created == null) {
+                    Toast.makeText(this, getString(R.string.invalid_collection_name), Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                addImageToCollectionAndRefresh(imageId, created.id)
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
+    }
+
+    private fun addImageToCollectionAndRefresh(imageId: Long, collectionId: Long) {
+        val added = ObjectBoxRepository.addImageToCollection(imageId, collectionId)
+        if (!added) {
+            Toast.makeText(this, getString(R.string.image_already_in_collection), Toast.LENGTH_SHORT).show()
+            return
+        }
+        renderCollectionChips(imageId)
+        setResult(RESULT_OK)
+        Toast.makeText(this, getString(R.string.image_added_to_collection), Toast.LENGTH_SHORT).show()
     }
 
     private fun preloadAround(uris: List<Uri>, center: Int) {

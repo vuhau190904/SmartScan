@@ -21,7 +21,8 @@ data class Image(
     var embeddingDescription: FloatArray? = null,
     var ocrText: String = "",
     var imageDescription: String? = null,
-    var note: String? = null
+    var note: String? = null,
+    var updatedAt: Long = System.currentTimeMillis()
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -36,6 +37,7 @@ data class Image(
         if (ocrText != other.ocrText) return false
         if (imageDescription != other.imageDescription) return false
         if (note != other.note) return false
+        if (updatedAt != other.updatedAt) return false
 
         return true
     }
@@ -48,6 +50,7 @@ data class Image(
         result = 31 * result + ocrText.hashCode()
         result = 31 * result + (imageDescription?.hashCode() ?: 0)
         result = 31 * result + (note?.hashCode() ?: 0)
+        result = 31 * result + updatedAt.hashCode()
         return result
     }
 }

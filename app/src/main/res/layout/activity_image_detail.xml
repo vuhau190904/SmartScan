@@ -120,10 +120,13 @@
                     <!-- Date -->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="56dp"
+                        android:layout_marginBottom="12dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp">
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="10dp">
 
                         <FrameLayout
                             android:layout_width="36dp"
@@ -175,20 +178,16 @@
 
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="?attr/colorOutline"
-                        android:alpha="0.2" />
-
                     <!-- File size -->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="56dp"
+                        android:layout_marginBottom="12dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp">
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="10dp">
 
                         <FrameLayout
                             android:layout_width="36dp"
@@ -240,20 +239,15 @@
 
                     </LinearLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="16dp"
-                        android:background="?attr/colorOutline"
-                        android:alpha="0.2" />
-
                     <!-- Dimensions -->
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="60dp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="56dp"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp">
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="10dp">
 
                         <FrameLayout
                             android:layout_width="36dp"
@@ -357,35 +351,28 @@
                 android:ellipsize="end"
                 tools:text="Ảnh chứa giao diện ứng dụng với thanh tìm kiếm ở phía trên." />
 
-            <TextView
-                android:id="@+id/tvNoteLabel"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/note"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif-medium"
-                android:letterSpacing="0.06"
-                android:textAllCaps="true"
-                android:textColor="?attr/colorOnSurfaceVariant" />
+                android:hint="@string/note"
+                style="@style/Widget.SmartScan.TextInput.Note"
+                app:placeholderText="@string/note_hint">
 
-            <EditText
-                android:id="@+id/etDetailNote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:hint="@string/note_hint"
-                android:backgroundTint="?attr/colorPrimary"
-                android:textColor="?attr/colorOnSurface"
-                android:textColorHint="?attr/colorOnSurfaceVariant"
-                android:fontFamily="sans-serif"
-                android:textSize="14sp"
-                android:minLines="3"
-                android:maxLines="5"
-                android:gravity="top|start"
-                android:inputType="textMultiLine|textCapSentences"
-                android:scrollbars="vertical"
-                tools:text="Ghi chú riêng cho ảnh này..." />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDetailNote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:gravity="top|start"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:maxLines="5"
+                    android:minLines="3"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="14sp"
+                    android:scrollbars="vertical"
+                    tools:text="Ghi chú riêng cho ảnh này..." />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveNote"
@@ -393,6 +380,35 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="@string/save_note"
+                android:minHeight="40dp"
+                style="?attr/materialButtonOutlinedStyle" />
+
+            <TextView
+                android:id="@+id/tvCollectionsOfImageLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/collections_of_image"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.06"
+                android:textAllCaps="true"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupImageCollections"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddImageToCollection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/add_to_collection"
                 android:minHeight="40dp"
                 style="?attr/materialButtonOutlinedStyle" />
 

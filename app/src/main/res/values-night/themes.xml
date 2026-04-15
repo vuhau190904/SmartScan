@@ -15,5 +15,6 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@color/color_background_dark</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.SmartScan.MaterialAlertDialog</item>
     </style>
 </resources>
