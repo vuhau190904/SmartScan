@@ -1,5 +1,6 @@
 package thesis.android.smart_scan.processor
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import thesis.android.smart_scan.model.Image
@@ -14,7 +15,7 @@ object ImageProcessor {
 
     private const val TAG = "ImageProcessor"
 
-    suspend fun process(uri: Uri) {
+    suspend fun process(context: Context, uri: Uri) {
         Log.d(TAG, "Bắt đầu xử lý ảnh: $uri")
 
         val textOCR = OCRService.recognizeFromUri(uri)
@@ -36,7 +37,7 @@ object ImageProcessor {
 //            text
 //        }
 
-        val description = ImageDescriptionService.describeImage(uri)
+        val description = ImageDescriptionService.describeImage(context, uri)
         val descriptionText = description.getOrNull()?.trim().orEmpty()
         Log.d(TAG, "Mô tả ảnh: $descriptionText")
 

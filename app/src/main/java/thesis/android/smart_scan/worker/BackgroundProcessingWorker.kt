@@ -26,7 +26,7 @@ class BackgroundProcessingWorker(
         Log.d(TAG, "Worker bắt đầu xử lý ảnh: $uri")
 
         return try {
-            ImageProcessor.process(uri)
+            ImageProcessor.process(applicationContext, uri)
             Log.d(TAG, "Worker đã hoàn thành xử lý ảnh thành công.")
             ImageEventBus.notifyNewImage()
             Result.success()

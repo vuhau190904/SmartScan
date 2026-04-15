@@ -1,14 +1,10 @@
 package thesis.android.smart_scan.service.mlkit
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.util.Log
 import com.google.common.util.concurrent.ListenableFuture
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import com.google.mlkit.genai.common.DownloadCallback
 import com.google.mlkit.genai.common.FeatureStatus
 import com.google.mlkit.genai.common.GenAiException
@@ -26,20 +22,18 @@ object ImageDescriptionService {
     private const val TAG = "ImageDescriptionService"
 
     private lateinit var describer: ImageDescriber
-    private lateinit var context: Context
 
     suspend fun init(context: Context) {
-        this.context = context.applicationContext
         describer = ImageDescription.getClient(
-            ImageDescriberOptions.builder(this.context).build()
+            ImageDescriberOptions.builder(context).build()
         )
         prepareModel(describer)
         Log.d(TAG, "ImageDescriptionService khởi tạo thành công.")
     }
 
-    suspend fun describeImage(uri: Uri): Result<String> {
+    suspend fun describeImage(context: Context, uri: Uri): Result<String> {
         val bitmap = run {
-            val source = ImageDecoder.createSource(this.context.contentResolver, uri)
+            val source = ImageDecoder.createSource(context.contentResolver, uri)
             ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
                 decoder.isMutableRequired = true
             }
