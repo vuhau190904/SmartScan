@@ -57,11 +57,11 @@
 
     </FrameLayout>
 
-    <!-- Bottom Sheet -->
+    <!-- Bottom Sheet: match_parent + NestedScrollView so long OCR/description scroll instead of clipping -->
     <LinearLayout
         android:id="@+id/bottomSheet"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@drawable/bg_bottom_sheet"
         android:backgroundTint="?attr/colorSurface"
@@ -69,6 +69,14 @@
         app:behavior_hideable="true"
         app:behavior_peekHeight="0dp"
         app:behavior_draggable="true">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:clipToPadding="false"
+            android:scrollbars="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -323,8 +331,7 @@
                 android:textSize="14sp"
                 android:fontFamily="sans-serif"
                 android:textColor="?attr/colorOnSurface"
-                android:maxLines="6"
-                android:ellipsize="end"
+                android:textIsSelectable="true"
                 tools:text="Đây là nội dung văn bản được trích xuất từ OCR." />
 
             <TextView
@@ -347,8 +354,7 @@
                 android:textSize="14sp"
                 android:fontFamily="sans-serif"
                 android:textColor="?attr/colorOnSurface"
-                android:maxLines="5"
-                android:ellipsize="end"
+                android:textIsSelectable="true"
                 tools:text="Ảnh chứa giao diện ứng dụng với thanh tìm kiếm ở phía trên." />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -431,6 +437,8 @@
                 style="?attr/materialButtonOutlinedStyle" />
 
         </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
 

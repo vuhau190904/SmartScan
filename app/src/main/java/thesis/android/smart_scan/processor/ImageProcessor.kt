@@ -8,6 +8,7 @@ import thesis.android.smart_scan.repository.ObjectBoxRepository
 import thesis.android.smart_scan.service.mlkit.ImageDescriptionService
 import thesis.android.smart_scan.service.mlkit.LanguageIdentifyService
 import thesis.android.smart_scan.service.mlkit.OCRService
+import thesis.android.smart_scan.service.mlkit.TextClassifierService
 import thesis.android.smart_scan.service.mlkit.TextEmbeddingService
 import thesis.android.smart_scan.service.mlkit.TranslateService
 
@@ -20,6 +21,14 @@ object ImageProcessor {
 
         val textOCR = OCRService.recognizeFromUri(uri)
         Log.d(TAG, "OCR xong — $textOCR")
+
+        val classifierEntities = if (textOCR.isNotBlank()) {
+            TextClassifierService.extractMetadata(textOCR)
+        } else {
+            emptyList()
+        }
+        val textClassifierJson = TextClassifierService.encodeEntityResults(classifierEntities)
+        Log.d(TAG, "TextClassifier: ${classifierEntities.size} thực thể")
 
         if (textOCR.isBlank()) {
             Log.w(TAG, "Ảnh không chứa văn bản, dừng xử lý.")
@@ -48,14 +57,17 @@ object ImageProcessor {
             TextEmbeddingService.embedText(it)
         }
 
-        ObjectBoxRepository.put(Image(
-            uri = uri,
-            embeddingOCR = embeddingOCR,
-            embeddingDescription = embeddingDescription,
-            ocrText = textOCR.trim(),
-            imageDescription = descriptionText.ifBlank { null },
-            updatedAt = System.currentTimeMillis()
-        ))
+        ObjectBoxRepository.put(
+            Image(
+                uri = uri,
+                embeddingOCR = embeddingOCR,
+                embeddingDescription = embeddingDescription,
+                ocrText = textOCR,
+                textClassifierJson = textClassifierJson,
+                imageDescription = descriptionText.ifBlank { null },
+                updatedAt = System.currentTimeMillis()
+            )
+        )
         Log.d(TAG, "Đã lưu Image vào ObjectBox.")
     }
 }
