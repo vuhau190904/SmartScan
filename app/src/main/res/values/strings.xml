@@ -54,4 +54,10 @@
     <string name="create_collection_with_plus">+ Tạo collection mới</string>
     <string name="unknown">Không rõ</string>
     <string name="page_counter">%1$d / %2$d</string>
+    <string name="voice_search">Tìm kiếm bằng giọng nói</string>
+    <string name="voice_note">Ghi chú bằng giọng nói</string>
+    <string name="voice_permission_required">Cần cấp quyền micro để dùng tính năng giọng nói</string>
+    <string name="voice_listening">Đang nghe...</string>
+    <string name="voice_no_text">Không nhận được nội dung giọng nói</string>
+    <string name="voice_not_supported">Thiết bị không hỗ trợ Speech Recognition</string>
 </resources>

@@ -55,7 +55,19 @@ object ImageDescriptionService {
     }
 
     private suspend fun prepareModel(client: ImageDescriber): Boolean {
-        val status = client.checkFeatureStatus().suspendAwait()
+        val status = try {
+            client.checkFeatureStatus().suspendAwait()
+        } catch (e: GenAiException) {
+            Log.e(
+                TAG,
+                "checkFeatureStatus lỗi GenAI (errorCode=${e.errorCode}, message=${e.message})",
+                e
+            )
+            return false
+        } catch (e: Exception) {
+            Log.e(TAG, "Không kiểm tra được trạng thái model Image Description", e)
+            return false
+        }
         Log.d(TAG, "Feature status: $status")
 
         return when (status) {

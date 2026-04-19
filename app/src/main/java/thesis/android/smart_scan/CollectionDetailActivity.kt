@@ -2,6 +2,7 @@ package thesis.android.smart_scan
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -28,6 +30,8 @@ import thesis.android.smart_scan.adapter.CollectionDetailImageAdapter
 import thesis.android.smart_scan.model.Image
 import thesis.android.smart_scan.processor.SearchProcessor
 import thesis.android.smart_scan.repository.ObjectBoxRepository
+import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionDelegate
+import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionUiHelper
 import thesis.android.smart_scan.util.Constant
 import thesis.android.smart_scan.util.inflateDialogTextInput
 
@@ -35,6 +39,7 @@ class CollectionDetailActivity : AppCompatActivity() {
 
     private lateinit var tvCollectionTitle: TextView
     private lateinit var etCollectionSearch: EditText
+    private lateinit var btnVoiceCollectionSearch: ImageButton
     private lateinit var rvCollectionDetailImages: RecyclerView
     private lateinit var tvDetailEmpty: TextView
     private lateinit var selectionBar: View
@@ -51,6 +56,9 @@ class CollectionDetailActivity : AppCompatActivity() {
     private var currentItems: List<Image> = emptyList()
     private var isSelectionMode = false
     private var currentQuery = ""
+    private var isVoiceSearching = false
+
+    private lateinit var speechRecognitionDelegate: SpeechRecognitionDelegate
 
     private val pickerLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -72,6 +80,7 @@ class CollectionDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        speechRecognitionDelegate = SpeechRecognitionDelegate(this)
         enableEdgeToEdge()
         setContentView(R.layout.activity_collection_detail)
 
@@ -94,6 +103,7 @@ class CollectionDetailActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.btnBackDetail).setOnClickListener { finish() }
         tvCollectionTitle = findViewById(R.id.tvCollectionTitle)
         etCollectionSearch = findViewById(R.id.etCollectionSearch)
+        btnVoiceCollectionSearch = findViewById(R.id.btnVoiceCollectionSearch)
         rvCollectionDetailImages = findViewById(R.id.rvCollectionDetailImages)
         tvDetailEmpty = findViewById(R.id.tvDetailEmpty)
         selectionBar = findViewById(R.id.selectionBar)
@@ -137,6 +147,10 @@ class CollectionDetailActivity : AppCompatActivity() {
     }
 
     private fun setupSearch() {
+        btnVoiceCollectionSearch.setOnClickListener {
+            startVoiceSearchInCollection()
+        }
+
         etCollectionSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -145,6 +159,45 @@ class CollectionDetailActivity : AppCompatActivity() {
                 loadImages()
             }
         })
+    }
+
+    private fun startVoiceSearchInCollection() {
+        if (isVoiceSearching) return
+        if (!hasRecordAudioPermission()) {
+            requestPermissions(arrayOf(android.Manifest.permission.RECORD_AUDIO), 3001)
+            Toast.makeText(this, getString(R.string.voice_permission_required), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        isVoiceSearching = true
+        btnVoiceCollectionSearch.isEnabled = false
+        Toast.makeText(this, getString(R.string.voice_listening), Toast.LENGTH_SHORT).show()
+
+        lifecycleScope.launch {
+            try {
+                SpeechRecognitionUiHelper.recognizeAndHandle(
+                    context = this@CollectionDetailActivity,
+                    delegate = speechRecognitionDelegate
+                ) { text ->
+                    etCollectionSearch.setText(text)
+                    etCollectionSearch.setSelection(text.length)
+                }
+            } finally {
+                onVoiceSearchFinished()
+            }
+        }
+    }
+
+    private fun onVoiceSearchFinished() {
+        isVoiceSearching = false
+        btnVoiceCollectionSearch.isEnabled = true
+    }
+
+    private fun hasRecordAudioPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun loadImages() {

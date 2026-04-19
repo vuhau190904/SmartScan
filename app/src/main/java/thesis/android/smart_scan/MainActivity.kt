@@ -1,6 +1,7 @@
 package thesis.android.smart_scan
 
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.content.Intent
 import android.graphics.Rect
 import android.net.Uri
@@ -8,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -21,6 +23,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -35,6 +38,7 @@ import kotlinx.coroutines.launch
 import thesis.android.smart_scan.adapter.CollectionCardAdapter
 import thesis.android.smart_scan.adapter.CollectionCardItem
 import thesis.android.smart_scan.adapter.ImageAdapter
+import thesis.android.smart_scan.config.AppConfig
 import thesis.android.smart_scan.model.ImageCollection
 import thesis.android.smart_scan.processor.SearchProcessor
 import thesis.android.smart_scan.repository.MediaContentRepository
@@ -42,6 +46,9 @@ import thesis.android.smart_scan.repository.ObjectBoxRepository
 import thesis.android.smart_scan.service.ScreenshotForegroundService
 import thesis.android.smart_scan.service.mlkit.ImageDescriptionService
 import thesis.android.smart_scan.service.mlkit.OCRService
+import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionDelegate
+import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionService
+import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionUiHelper
 import thesis.android.smart_scan.service.mlkit.TextEmbeddingService
 import thesis.android.smart_scan.service.mlkit.TranslateService
 import thesis.android.smart_scan.util.Constant
@@ -52,16 +59,19 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
 
     companion object {
+        private const val TAG = "MainActivity"
         private const val PAGE_SIZE = 30L
         private const val PREFETCH_DISTANCE = 8
         private const val SEARCH_DEBOUNCE_MS = 400L
         private const val GRID_SPAN_COUNT = 3
         private const val GRID_SPACING_DP = 6
+        private const val REQUEST_RECORD_AUDIO = 2001
     }
 
     // ── Views ──────────────────────────────────────────────────────────────
 
     private lateinit var etSearch: EditText
+    private lateinit var btnVoiceSearch: ImageButton
     private lateinit var tvResultCount: TextView
     private lateinit var collectionHeader: View
     private lateinit var screenshotsSectionHeader: View
@@ -87,6 +97,9 @@ class MainActivity : AppCompatActivity() {
     private var searchJob: Job? = null
     private var searchResultsCache: List<Uri> = emptyList()
     private var searchPageOffset = 0
+    private var isVoiceSearching = false
+
+    private lateinit var speechRecognitionDelegate: SpeechRecognitionDelegate
 
     private val imageDetailLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -101,6 +114,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        speechRecognitionDelegate = SpeechRecognitionDelegate(this)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         applyWindowInsets()
@@ -139,6 +153,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindViews() {
         etSearch = findViewById(R.id.etSearch)
+        btnVoiceSearch = findViewById(R.id.btnVoiceSearch)
         tvResultCount = findViewById(R.id.tvResultCount)
         collectionHeader = findViewById(R.id.collectionHeader)
         screenshotsSectionHeader = findViewById(R.id.screenshotsSectionHeader)
@@ -184,6 +199,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupSearch() {
+        btnVoiceSearch.setOnClickListener {
+            startVoiceSearch()
+        }
+
         etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -365,7 +384,15 @@ class MainActivity : AppCompatActivity() {
         OCRService.init(this)
         TextEmbeddingService.init(this)
         TranslateService.init(Locale.getDefault().language)
-        ImageDescriptionService.init(this)
+        runCatching { ImageDescriptionService.init(this) }
+            .onFailure { e ->
+                Log.w(TAG, "ImageDescriptionService init thất bại trên thiết bị này: ${e.message}", e)
+            }
+        val speechLocale = Locale.forLanguageTag(AppConfig().userLanguage)
+        runCatching { SpeechRecognitionService.init(speechLocale) }
+            .onFailure { e ->
+                Log.w(TAG, "SpeechRecognitionService init thất bại trên thiết bị này: ${e.message}", e)
+            }
     }
 
     private fun hideKeyboard() {
@@ -374,11 +401,60 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestPermission() {
+        val needsAudio = ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.RECORD_AUDIO
+        ) != PackageManager.PERMISSION_GRANTED
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPermissions(arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES), 100)
+            val permissions = mutableListOf(android.Manifest.permission.READ_MEDIA_IMAGES)
+            if (needsAudio) permissions += android.Manifest.permission.RECORD_AUDIO
+            requestPermissions(permissions.toTypedArray(), 100)
         } else {
-            requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 100)
+            val permissions = mutableListOf(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            if (needsAudio) permissions += android.Manifest.permission.RECORD_AUDIO
+            requestPermissions(permissions.toTypedArray(), 100)
         }
+    }
+
+    private fun startVoiceSearch() {
+        if (isVoiceSearching) return
+        if (!hasRecordAudioPermission()) {
+            requestPermissions(arrayOf(android.Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
+            Toast.makeText(this, getString(R.string.voice_permission_required), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        isVoiceSearching = true
+        btnVoiceSearch.isEnabled = false
+        Toast.makeText(this, getString(R.string.voice_listening), Toast.LENGTH_SHORT).show()
+
+        lifecycleScope.launch {
+            try {
+                SpeechRecognitionUiHelper.recognizeAndHandle(
+                    context = this@MainActivity,
+                    delegate = speechRecognitionDelegate,
+                    logTag = TAG
+                ) { text ->
+                    etSearch.setText(text)
+                    etSearch.setSelection(text.length)
+                }
+            } finally {
+                onVoiceSearchFinished()
+            }
+        }
+    }
+
+    private fun onVoiceSearchFinished() {
+        isVoiceSearching = false
+        btnVoiceSearch.isEnabled = true
+    }
+
+    private fun hasRecordAudioPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun renderCollections() {
