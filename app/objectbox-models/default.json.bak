@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:5801394573898257216",
-      "lastPropertyId": "8:3499963979921564228",
+      "lastPropertyId": "9:2689859856101808798",
       "name": "Image",
       "properties": [
         {
@@ -47,13 +47,89 @@
           "id": "8:3499963979921564228",
           "name": "note",
           "type": 9
+        },
+        {
+          "id": "9:2689859856101808798",
+          "name": "updatedAt",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:4090082224141948749",
+      "lastPropertyId": "5:3158407494218738892",
+      "name": "CollectionMembership",
+      "properties": [
+        {
+          "id": "1:933710631491761025",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7511489572547105032",
+          "name": "collectionId",
+          "indexId": "4:630662581668727767",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "3:6156073926373998122",
+          "name": "imageId",
+          "indexId": "5:2620569790429339683",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "4:4661786759755478536",
+          "name": "membershipKey",
+          "indexId": "6:7318021572597012638",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "5:3158407494218738892",
+          "name": "addedAt",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:2707670165767286457",
+      "lastPropertyId": "4:8557694394389741827",
+      "name": "ImageCollection",
+      "properties": [
+        {
+          "id": "1:3746992143165118945",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:990779239279460681",
+          "name": "name",
+          "indexId": "7:2292883612761979844",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "3:345869249679313386",
+          "name": "createdAt",
+          "type": 6
+        },
+        {
+          "id": "4:8557694394389741827",
+          "name": "updatedAt",
+          "type": 6
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "1:5801394573898257216",
-  "lastIndexId": "3:5691045260127190141",
+  "lastEntityId": "3:2707670165767286457",
+  "lastIndexId": "7:2292883612761979844",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

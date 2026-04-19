@@ -6,6 +6,8 @@ import android.content.pm.PackageManager
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.view.textclassifier.TextClassificationManager
+import android.view.textclassifier.TextClassifier
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
@@ -30,6 +32,7 @@ import thesis.android.smart_scan.model.ImageCollection
 import thesis.android.smart_scan.adapter.DetailImagePagerAdapter
 import thesis.android.smart_scan.repository.MediaContentRepository
 import thesis.android.smart_scan.repository.ObjectBoxRepository
+import thesis.android.smart_scan.service.mlkit.TextClassifierService
 import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionDelegate
 import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionUiHelper
 import thesis.android.smart_scan.util.Constant
@@ -134,6 +137,22 @@ class ImageDetailActivity : AppCompatActivity() {
             val image = currentUri?.let { uri -> ObjectBoxRepository.getByUri(uri) } ?: return@setOnClickListener
             showAddToCollectionDialog(image.id)
         }
+
+        setupSelectableTextWithSmartActions()
+    }
+
+    private fun setupSelectableTextWithSmartActions() {
+        listOf(tvOcrText, tvImageDescription).forEach { tv ->
+            tv.setTextIsSelectable(true)
+        }
+        applyTextClassifierPolicyToDetailTextViews()
+    }
+
+    private fun applyTextClassifierPolicyToDetailTextViews() {
+        val tcm = getSystemService(TextClassificationManager::class.java) ?: return
+        val systemClassifier = tcm.textClassifier
+        tvOcrText.setTextClassifier(systemClassifier)
+        tvImageDescription.setTextClassifier(TextClassifier.NO_OP)
     }
 
     private fun setupViewPager(uris: List<Uri>, startPosition: Int) {
@@ -225,11 +244,21 @@ class ImageDetailActivity : AppCompatActivity() {
         }
 
         val ocrText = indexedImage?.ocrText?.takeIf { it.isNotBlank() }
+        val classifierEntities = indexedImage?.textClassifierJson
+            ?.takeIf { it.isNotBlank() }
+            ?.let { TextClassifierService.decodeEntityResults(it) }
+            .orEmpty()
+        val ocrDisplay: CharSequence = when {
+            ocrText == null -> ""
+            classifierEntities.isNotEmpty() ->
+                TextClassifierService.buildHighlightedEntitySpannable(this, ocrText, classifierEntities)
+            else -> ocrText
+        }
         val imageDescription = indexedImage?.imageDescription?.takeIf { it.isNotBlank() }
 
         tvOcrLabel.visibility = if (ocrText != null) View.VISIBLE else View.GONE
         tvOcrText.visibility = if (ocrText != null) View.VISIBLE else View.GONE
-        tvOcrText.text = ocrText.orEmpty()
+        tvOcrText.text = ocrDisplay
 
         tvDescriptionLabel.visibility =
             if (imageDescription != null) View.VISIBLE else View.GONE
@@ -239,6 +268,8 @@ class ImageDetailActivity : AppCompatActivity() {
 
         etNote.setText(indexedImage?.note.orEmpty())
         renderCollectionChips(indexedImage?.id ?: 0L)
+
+        applyTextClassifierPolicyToDetailTextViews()
     }
 
     private fun renderCollectionChips(imageId: Long) {

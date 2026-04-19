@@ -46,6 +46,7 @@ import thesis.android.smart_scan.repository.ObjectBoxRepository
 import thesis.android.smart_scan.service.ScreenshotForegroundService
 import thesis.android.smart_scan.service.mlkit.ImageDescriptionService
 import thesis.android.smart_scan.service.mlkit.OCRService
+import thesis.android.smart_scan.service.mlkit.TextClassifierService
 import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionDelegate
 import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionService
 import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionUiHelper
@@ -384,6 +385,7 @@ class MainActivity : AppCompatActivity() {
         OCRService.init(this)
         TextEmbeddingService.init(this)
         TranslateService.init(Locale.getDefault().language)
+        TextClassifierService.init(this)
         runCatching { ImageDescriptionService.init(this) }
             .onFailure { e ->
                 Log.w(TAG, "ImageDescriptionService init thất bại trên thiết bị này: ${e.message}", e)
