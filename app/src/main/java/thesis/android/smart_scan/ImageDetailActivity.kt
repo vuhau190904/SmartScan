@@ -2,6 +2,7 @@ package thesis.android.smart_scan
 
 import android.net.Uri
 import android.os.Bundle
+import android.content.pm.PackageManager
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -16,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.google.android.material.button.MaterialButton
@@ -27,11 +30,14 @@ import thesis.android.smart_scan.model.ImageCollection
 import thesis.android.smart_scan.adapter.DetailImagePagerAdapter
 import thesis.android.smart_scan.repository.MediaContentRepository
 import thesis.android.smart_scan.repository.ObjectBoxRepository
+import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionDelegate
+import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionUiHelper
 import thesis.android.smart_scan.util.Constant
 import thesis.android.smart_scan.util.inflateDialogTextInput
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class ImageDetailActivity : AppCompatActivity() {
@@ -55,14 +61,19 @@ class ImageDetailActivity : AppCompatActivity() {
     private lateinit var tvDescriptionLabel: TextView
     private lateinit var tvImageDescription: TextView
     private lateinit var etNote: EditText
+    private lateinit var btnVoiceNote: ImageButton
     private lateinit var btnSaveNote: MaterialButton
     private lateinit var chipGroupImageCollections: ChipGroup
     private lateinit var btnAddImageToCollection: MaterialButton
     private lateinit var tvPageCounter: TextView
     private var currentUri: Uri? = null
+    private var isVoiceTypingNote = false
+
+    private lateinit var speechRecognitionDelegate: SpeechRecognitionDelegate
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        speechRecognitionDelegate = SpeechRecognitionDelegate(this)
         enableEdgeToEdge()
         setContentView(R.layout.activity_image_detail)
 
@@ -103,6 +114,7 @@ class ImageDetailActivity : AppCompatActivity() {
         tvDescriptionLabel = findViewById(R.id.tvDescriptionLabel)
         tvImageDescription = findViewById(R.id.tvDetailImageDescription)
         etNote = findViewById(R.id.etDetailNote)
+        btnVoiceNote = findViewById(R.id.btnVoiceNote)
         btnSaveNote = findViewById(R.id.btnSaveNote)
         chipGroupImageCollections = findViewById(R.id.chipGroupImageCollections)
         btnAddImageToCollection = findViewById(R.id.btnAddImageToCollection)
@@ -112,6 +124,10 @@ class ImageDetailActivity : AppCompatActivity() {
             val uri = currentUri ?: return@setOnClickListener
             ObjectBoxRepository.updateNoteByUri(uri, etNote.text?.toString()?.trim())
             Toast.makeText(this, getString(R.string.note_saved), Toast.LENGTH_SHORT).show()
+        }
+
+        btnVoiceNote.setOnClickListener {
+            startVoiceNoteInput()
         }
 
         btnAddImageToCollection.setOnClickListener {
@@ -303,5 +319,46 @@ class ImageDetailActivity : AppCompatActivity() {
         bytes >= 1024L * 1024 -> "%.1f MB".format(bytes / (1024.0 * 1024.0))
         bytes >= 1024 -> "%.1f KB".format(bytes / 1024.0)
         else -> "$bytes B"
+    }
+
+    private fun startVoiceNoteInput() {
+        if (isVoiceTypingNote) return
+        if (!hasRecordAudioPermission()) {
+            requestPermissions(arrayOf(android.Manifest.permission.RECORD_AUDIO), 4001)
+            Toast.makeText(this, getString(R.string.voice_permission_required), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        isVoiceTypingNote = true
+        btnVoiceNote.isEnabled = false
+        Toast.makeText(this, getString(R.string.voice_listening), Toast.LENGTH_SHORT).show()
+
+        lifecycleScope.launch {
+            try {
+                SpeechRecognitionUiHelper.recognizeAndHandle(
+                    context = this@ImageDetailActivity,
+                    delegate = speechRecognitionDelegate
+                ) { text ->
+                    val current = etNote.text?.toString().orEmpty().trim()
+                    val merged = if (current.isBlank()) text else "$current $text"
+                    etNote.setText(merged)
+                    etNote.setSelection(merged.length)
+                }
+            } finally {
+                onVoiceNoteFinished()
+            }
+        }
+    }
+
+    private fun onVoiceNoteFinished() {
+        isVoiceTypingNote = false
+        btnVoiceNote.isEnabled = true
+    }
+
+    private fun hasRecordAudioPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }
