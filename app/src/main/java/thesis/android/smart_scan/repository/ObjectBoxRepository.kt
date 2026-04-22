@@ -29,9 +29,9 @@ object ObjectBoxRepository {
         membershipBox = store.boxFor(CollectionMembership::class.java)
     }
 
-    fun put(image: Image) {
+    fun put(image: Image): Long {
         image.updatedAt = System.currentTimeMillis()
-        imageBox.put(image)
+        return imageBox.put(image)
     }
 
     fun getByUri(uri: Uri): Image? {
@@ -59,6 +59,22 @@ object ObjectBoxRepository {
         )
         collection.id = collectionBox.put(collection)
         return collection
+    }
+
+    fun findCollectionByNameIgnoreCase(name: String): ImageCollection? {
+        val key = name.trim()
+        if (key.isEmpty()) return null
+        return collectionBox.all.firstOrNull { it.name.equals(key, ignoreCase = true) }
+    }
+
+    /**
+     * Trả về collection đã có (theo tên ignore-case) hoặc tạo mới với [label] đã trim.
+     */
+    fun getOrCreateCollectionForLabel(label: String): ImageCollection? {
+        val trimmed = label.trim()
+        if (trimmed.isEmpty()) return null
+        findCollectionByNameIgnoreCase(trimmed)?.let { return it }
+        return createCollection(trimmed)
     }
 
     fun renameCollection(collectionId: Long, newName: String): Boolean {
