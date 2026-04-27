@@ -23,6 +23,7 @@ data class Image(
     var textClassifierJson: String = "",
     var imageDescription: String? = null,
     var note: String? = null,
+    var reminderConfig: String? = null, // JSON: {title, dateTime, location, createdAt}
     var updatedAt: Long = System.currentTimeMillis()
 ) {
     override fun equals(other: Any?): Boolean {
@@ -39,6 +40,7 @@ data class Image(
         if (textClassifierJson != other.textClassifierJson) return false
         if (imageDescription != other.imageDescription) return false
         if (note != other.note) return false
+        if (reminderConfig != other.reminderConfig) return false
         if (updatedAt != other.updatedAt) return false
 
         return true
@@ -53,6 +55,7 @@ data class Image(
         result = 31 * result + textClassifierJson.hashCode()
         result = 31 * result + (imageDescription?.hashCode() ?: 0)
         result = 31 * result + (note?.hashCode() ?: 0)
+        result = 31 * result + (reminderConfig?.hashCode() ?: 0)
         result = 31 * result + updatedAt.hashCode()
         return result
     }

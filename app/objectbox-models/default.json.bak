@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:5801394573898257216",
-      "lastPropertyId": "9:2689859856101808798",
+      "lastPropertyId": "11:9016350815664189778",
       "name": "Image",
       "properties": [
         {
@@ -52,6 +52,16 @@
           "id": "9:2689859856101808798",
           "name": "updatedAt",
           "type": 6
+        },
+        {
+          "id": "10:4846940682649876680",
+          "name": "textClassifierJson",
+          "type": 9
+        },
+        {
+          "id": "11:9016350815664189778",
+          "name": "reminderConfig",
+          "type": 9
         }
       ],
       "relations": []

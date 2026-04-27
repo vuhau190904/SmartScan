@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:5801394573898257216",
-      "lastPropertyId": "10:4846940682649876680",
+      "lastPropertyId": "11:9016350815664189778",
       "name": "Image",
       "properties": [
         {
@@ -56,6 +56,11 @@
         {
           "id": "10:4846940682649876680",
           "name": "textClassifierJson",
+          "type": 9
+        },
+        {
+          "id": "11:9016350815664189778",
+          "name": "reminderConfig",
           "type": 9
         }
       ],
@@ -131,10 +136,53 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "4:5958278179913817626",
+      "lastPropertyId": "6:158748010860694686",
+      "name": "Reminder",
+      "properties": [
+        {
+          "id": "1:3430985637531486109",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6633321065275080885",
+          "name": "imageId",
+          "indexId": "8:3780385851563472911",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "3:677867142240373554",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "4:8860128814079763656",
+          "name": "note",
+          "type": 9
+        },
+        {
+          "id": "5:715921071483564145",
+          "name": "reminderTime",
+          "indexId": "9:5555460767565186077",
+          "type": 6,
+          "flags": 8
+        },
+        {
+          "id": "6:158748010860694686",
+          "name": "createdAt",
+          "type": 6
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "3:2707670165767286457",
-  "lastIndexId": "7:2292883612761979844",
+  "lastEntityId": "4:5958278179913817626",
+  "lastIndexId": "9:5555460767565186077",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

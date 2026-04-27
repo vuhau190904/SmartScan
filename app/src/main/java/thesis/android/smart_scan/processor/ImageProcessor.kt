@@ -30,7 +30,7 @@ object ImageProcessor {
             emptyList()
         }
         val textClassifierJson = TextClassifierService.encodeEntityResults(classifierEntities)
-        Log.d(TAG, "TextClassifier: ${classifierEntities.size} thực thể")
+        Log.d(TAG, "TextClassifier: ${classifierEntities}")
 
         if (textOCR.isBlank()) {
             Log.d(TAG, "OCR rỗng — vẫn tiếp tục index ảnh và phân collection theo object.")

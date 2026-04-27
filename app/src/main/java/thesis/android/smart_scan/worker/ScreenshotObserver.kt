@@ -37,7 +37,7 @@ class ScreenshotObserver(private val context: Context) : ContentObserver(handler
 
     override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
         super.onChange(selfChange, uri)
-        if (uri != null && flags == 5) {
+        if (uri != null) {
             Handler(Looper.getMainLooper()).postDelayed({
                 scheduleScanWorker(uri)
             }, 1000)
