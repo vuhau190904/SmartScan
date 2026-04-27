@@ -16,6 +16,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.HorizontalScrollView
+import androidx.core.widget.NestedScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -52,6 +53,7 @@ import thesis.android.smart_scan.util.EntityActionHelper
 import thesis.android.smart_scan.util.inflateDialogTextInput
 import android.text.method.LinkMovementMethod
 import android.util.Log
+import android.widget.ProgressBar
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -91,9 +93,13 @@ class ImageDetailActivity : AppCompatActivity() {
     private lateinit var scheduledRemindersAddChipGroup: ChipGroup
     private lateinit var scheduledRemindersChipGroup: ChipGroup
     private lateinit var tvNoReminders: TextView
+    private lateinit var bottomSheetContent: NestedScrollView
+    private lateinit var progressMetadata: ProgressBar
     private var currentUri: Uri? = null
     private var currentImageId: Long = 0L
+    private var currentPosition: Int = 0
     private var isVoiceTypingNote = false
+    private var isMetadataLoading = false
 
     private lateinit var speechRecognitionDelegate: SpeechRecognitionDelegate
 
@@ -167,6 +173,8 @@ class ImageDetailActivity : AppCompatActivity() {
         scheduledRemindersAddChipGroup = findViewById(R.id.scheduledRemindersAddChipGroup)
         scheduledRemindersChipGroup = findViewById(R.id.scheduledRemindersChipGroup)
         tvNoReminders = findViewById(R.id.tvNoReminders)
+        bottomSheetContent = findViewById(R.id.bottomSheetContent)
+        progressMetadata = findViewById(R.id.progressMetadata)
 
         btnSaveNote.setOnClickListener {
             val uri = currentUri ?: return@setOnClickListener
@@ -203,15 +211,15 @@ class ImageDetailActivity : AppCompatActivity() {
         viewPager.setCurrentItem(startPosition, false)
 
         updatePageCounter(startPosition + 1, uris.size)
-        updateMetadata(uris[startPosition])
+        currentPosition = startPosition
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 }
-                updateMetadata(uris[position])
                 updatePageCounter(position + 1, uris.size)
+                currentPosition = position
             }
         })
     }
@@ -223,6 +231,21 @@ class ImageDetailActivity : AppCompatActivity() {
             isHideable = true
             skipCollapsed = true
             state = BottomSheetBehavior.STATE_HIDDEN
+
+            addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        // Skip if already loading (swipe gesture handled loading)
+                        if (isMetadataLoading) return
+                        val uris = resolveUris() ?: return
+                        if (currentPosition in uris.indices) {
+                            updateMetadata(uris[currentPosition])
+                        }
+                    }
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+            })
         }
     }
 
@@ -237,7 +260,11 @@ class ImageDetailActivity : AppCompatActivity() {
                     && abs(velocityY) > abs(velocityX)
 
                 if (isUpward && bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                    bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                    val uris = resolveUris() ?: return false
+                    if (currentPosition !in uris.indices) return false
+                    // Load data first, expand bottom sheet only after loading completes
+                    showMetadataLoading()
+                    updateMetadataForPosition(uris[currentPosition])
                     return true
                 }
                 return false
@@ -303,6 +330,26 @@ class ImageDetailActivity : AppCompatActivity() {
         applyTextClassifierPolicyToDetailTextViews()
         renderEntityCards(classifierEntities)
         renderScheduledReminders()
+    }
+
+    private fun updateMetadataForPosition(uri: Uri) {
+        showMetadataLoading()
+        updateMetadata(uri)
+        // Expand bottom sheet after data is loaded
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        hideMetadataLoading()
+    }
+
+    private fun showMetadataLoading() {
+        isMetadataLoading = true
+        progressMetadata.visibility = View.VISIBLE
+        bottomSheetContent.visibility = View.GONE
+    }
+
+    private fun hideMetadataLoading() {
+        isMetadataLoading = false
+        progressMetadata.visibility = View.GONE
+        bottomSheetContent.visibility = View.VISIBLE
     }
 
     private fun renderScheduledReminders() {

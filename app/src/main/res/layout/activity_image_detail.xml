@@ -57,6 +57,15 @@
 
     </FrameLayout>
 
+    <!-- Loading indicator -->
+    <ProgressBar
+        android:id="@+id/progressLoading"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/white"
+        android:visibility="gone" />
+
     <!-- Bottom Sheet: match_parent + NestedScrollView so long OCR/description scroll instead of clipping -->
     <LinearLayout
         android:id="@+id/bottomSheet"
@@ -70,7 +79,18 @@
         app:behavior_peekHeight="0dp"
         app:behavior_draggable="true">
 
+        <!-- Loading indicator for metadata -->
+        <ProgressBar
+            android:id="@+id/progressMetadata"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="48dp"
+            android:indeterminateTint="?attr/colorPrimary"
+            android:visibility="gone" />
+
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/bottomSheetContent"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
