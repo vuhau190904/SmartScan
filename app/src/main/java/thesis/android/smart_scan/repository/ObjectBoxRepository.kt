@@ -11,12 +11,15 @@ import thesis.android.smart_scan.model.ImageCollection
 import thesis.android.smart_scan.model.ImageCollection_
 import thesis.android.smart_scan.model.Image_
 import thesis.android.smart_scan.model.MyObjectBox
+import thesis.android.smart_scan.model.Reminder
+import thesis.android.smart_scan.model.Reminder_
 
-object ObjectBoxRepository {
+object                                                                                                                                                                                                                                                                                                          ObjectBoxRepository {
     lateinit var store: BoxStore
     lateinit var imageBox: Box<Image>
     lateinit var collectionBox: Box<ImageCollection>
     lateinit var membershipBox: Box<CollectionMembership>
+    lateinit var reminderBox: Box<Reminder>
 
     const val TAG = "ObjectBoxService"
 
@@ -27,6 +30,7 @@ object ObjectBoxRepository {
         imageBox = store.boxFor(Image::class.java)
         collectionBox = store.boxFor(ImageCollection::class.java)
         membershipBox = store.boxFor(CollectionMembership::class.java)
+        reminderBox = store.boxFor(Reminder::class.java)
     }
 
     fun put(image: Image): Long {
@@ -43,6 +47,13 @@ object ObjectBoxRepository {
     fun updateNoteByUri(uri: Uri, note: String?) {
         val image = getByUri(uri) ?: return
         image.note = note?.takeIf { it.isNotBlank() }
+        image.updatedAt = System.currentTimeMillis()
+        imageBox.put(image)
+    }
+
+    fun updateReminderConfigByUri(uri: Uri, reminderConfig: String?) {
+        val image = getByUri(uri) ?: return
+        image.reminderConfig = reminderConfig
         image.updatedAt = System.currentTimeMillis()
         imageBox.put(image)
     }
@@ -232,4 +243,45 @@ object ObjectBoxRepository {
     }
 
     fun count(): Long = imageBox.count()
+
+    // ========== Reminder CRUD ==========
+
+    fun putReminder(reminder: Reminder): Long {
+        return reminderBox.put(reminder)
+    }
+
+    fun deleteReminder(reminderId: Long) {
+        reminderBox.remove(reminderId)
+    }
+
+    fun getReminder(id: Long): Reminder? = reminderBox.get(id)
+
+    /**
+     * Returns all reminders where reminderTime > currentTime, ordered by reminderTime ascending.
+     */
+    fun getPendingReminders(): List<Reminder> {
+        val now = System.currentTimeMillis()
+        val query = reminderBox.query()
+            .greater(Reminder_.reminderTime, now)
+            .order(Reminder_.reminderTime)
+            .build()
+        val result = query.find()
+        query.close()
+        return result
+    }
+
+    /**
+     * Returns pending reminders for a specific image.
+     */
+    fun getPendingRemindersForImage(imageId: Long): List<Reminder> {
+        val now = System.currentTimeMillis()
+        val query = reminderBox.query()
+            .equal(Reminder_.imageId, imageId)
+            .greater(Reminder_.reminderTime, now)
+            .order(Reminder_.reminderTime)
+            .build()
+        val result = query.find()
+        query.close()
+        return result
+    }
 }

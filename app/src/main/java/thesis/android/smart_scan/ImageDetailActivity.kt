@@ -2,6 +2,10 @@ package thesis.android.smart_scan
 
 import android.net.Uri
 import android.os.Bundle
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -11,6 +15,7 @@ import android.view.textclassifier.TextClassifier
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -27,17 +32,28 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
+import thesis.android.smart_scan.R
 import thesis.android.smart_scan.model.ImageCollection
+import thesis.android.smart_scan.model.Reminder
 import thesis.android.smart_scan.adapter.DetailImagePagerAdapter
 import thesis.android.smart_scan.repository.MediaContentRepository
 import thesis.android.smart_scan.repository.ObjectBoxRepository
+import thesis.android.smart_scan.receiver.ReminderReceiver
+import thesis.android.smart_scan.service.mlkit.EntityResult
 import thesis.android.smart_scan.service.mlkit.TextClassifierService
 import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionDelegate
 import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionUiHelper
 import thesis.android.smart_scan.util.Constant
+import thesis.android.smart_scan.util.EntityActionHelper
 import thesis.android.smart_scan.util.inflateDialogTextInput
+import android.text.method.LinkMovementMethod
+import android.util.Log
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
@@ -59,8 +75,6 @@ class ImageDetailActivity : AppCompatActivity() {
     private lateinit var tvDate: TextView
     private lateinit var tvSize: TextView
     private lateinit var tvDimensions: TextView
-    private lateinit var tvOcrLabel: TextView
-    private lateinit var tvOcrText: TextView
     private lateinit var tvDescriptionLabel: TextView
     private lateinit var tvImageDescription: TextView
     private lateinit var etNote: EditText
@@ -69,7 +83,16 @@ class ImageDetailActivity : AppCompatActivity() {
     private lateinit var chipGroupImageCollections: ChipGroup
     private lateinit var btnAddImageToCollection: MaterialButton
     private lateinit var tvPageCounter: TextView
+    private lateinit var tvEntitiesLabel: TextView
+    private lateinit var entityCardsContainer: HorizontalScrollView
+    private lateinit var entityCardsLinearLayout: LinearLayout
+    private lateinit var tvScheduledRemindersLabel: TextView
+    private lateinit var scheduledRemindersContent: LinearLayout
+    private lateinit var scheduledRemindersAddChipGroup: ChipGroup
+    private lateinit var scheduledRemindersChipGroup: ChipGroup
+    private lateinit var tvNoReminders: TextView
     private var currentUri: Uri? = null
+    private var currentImageId: Long = 0L
     private var isVoiceTypingNote = false
 
     private lateinit var speechRecognitionDelegate: SpeechRecognitionDelegate
@@ -100,6 +123,22 @@ class ImageDetailActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(ev)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 4002) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, continue with pending reminder
+                pendingReminderEntity?.let { entity ->
+                    pendingReminderEntity = null
+                    showReminderDialogWithEntity(entity)
+                } ?: showReminderDialog()
+            } else {
+                Toast.makeText(this, R.string.reminder_permission_denied, Toast.LENGTH_SHORT).show()
+                pendingReminderEntity = null
+            }
+        }
+    }
+
     private fun resolveUris(): List<Uri>? {
         val strings = intent.getStringArrayListExtra(Constant.IMAGE_URIS)
             ?: intent.getStringExtra(Constant.IMAGE_URI)?.let { arrayListOf(it) }
@@ -112,8 +151,6 @@ class ImageDetailActivity : AppCompatActivity() {
         tvDate = findViewById(R.id.tvDetailDate)
         tvSize = findViewById(R.id.tvDetailSize)
         tvDimensions = findViewById(R.id.tvDetailDimensions)
-        tvOcrLabel = findViewById(R.id.tvOcrLabel)
-        tvOcrText = findViewById(R.id.tvDetailOcrText)
         tvDescriptionLabel = findViewById(R.id.tvDescriptionLabel)
         tvImageDescription = findViewById(R.id.tvDetailImageDescription)
         etNote = findViewById(R.id.etDetailNote)
@@ -122,6 +159,14 @@ class ImageDetailActivity : AppCompatActivity() {
         chipGroupImageCollections = findViewById(R.id.chipGroupImageCollections)
         btnAddImageToCollection = findViewById(R.id.btnAddImageToCollection)
         tvPageCounter = findViewById(R.id.tvPageCounter)
+        tvEntitiesLabel = findViewById(R.id.tvEntitiesLabel)
+        entityCardsContainer = findViewById(R.id.entityCardsContainer)
+        entityCardsLinearLayout = findViewById(R.id.entityCardsLinearLayout)
+        tvScheduledRemindersLabel = findViewById(R.id.tvScheduledRemindersLabel)
+        scheduledRemindersContent = findViewById(R.id.scheduledRemindersContent)
+        scheduledRemindersAddChipGroup = findViewById(R.id.scheduledRemindersAddChipGroup)
+        scheduledRemindersChipGroup = findViewById(R.id.scheduledRemindersChipGroup)
+        tvNoReminders = findViewById(R.id.tvNoReminders)
 
         btnSaveNote.setOnClickListener {
             val uri = currentUri ?: return@setOnClickListener
@@ -142,17 +187,13 @@ class ImageDetailActivity : AppCompatActivity() {
     }
 
     private fun setupSelectableTextWithSmartActions() {
-        listOf(tvOcrText, tvImageDescription).forEach { tv ->
-            tv.setTextIsSelectable(true)
-        }
-        applyTextClassifierPolicyToDetailTextViews()
+        tvImageDescription.setTextIsSelectable(true)
     }
 
     private fun applyTextClassifierPolicyToDetailTextViews() {
         val tcm = getSystemService(TextClassificationManager::class.java) ?: return
         val systemClassifier = tcm.textClassifier
-        tvOcrText.setTextClassifier(systemClassifier)
-        tvImageDescription.setTextClassifier(TextClassifier.NO_OP)
+        tvImageDescription.setTextClassifier(systemClassifier)
     }
 
     private fun setupViewPager(uris: List<Uri>, startPosition: Int) {
@@ -224,6 +265,7 @@ class ImageDetailActivity : AppCompatActivity() {
     private fun updateMetadata(uri: Uri) {
         currentUri = uri
         val indexedImage = ObjectBoxRepository.getByUri(uri)
+        currentImageId = indexedImage?.id ?: 0L
         val info = MediaContentRepository.getImageDetails(uri)
         if (info != null) {
             tvFileName.text = info.displayName
@@ -243,22 +285,7 @@ class ImageDetailActivity : AppCompatActivity() {
             tvDimensions.text = unknown
         }
 
-        val ocrText = indexedImage?.ocrText?.takeIf { it.isNotBlank() }
-        val classifierEntities = indexedImage?.textClassifierJson
-            ?.takeIf { it.isNotBlank() }
-            ?.let { TextClassifierService.decodeEntityResults(it) }
-            .orEmpty()
-        val ocrDisplay: CharSequence = when {
-            ocrText == null -> ""
-            classifierEntities.isNotEmpty() ->
-                TextClassifierService.buildHighlightedEntitySpannable(this, ocrText, classifierEntities)
-            else -> ocrText
-        }
         val imageDescription = indexedImage?.imageDescription?.takeIf { it.isNotBlank() }
-
-        tvOcrLabel.visibility = if (ocrText != null) View.VISIBLE else View.GONE
-        tvOcrText.visibility = if (ocrText != null) View.VISIBLE else View.GONE
-        tvOcrText.text = ocrDisplay
 
         tvDescriptionLabel.visibility =
             if (imageDescription != null) View.VISIBLE else View.GONE
@@ -269,7 +296,271 @@ class ImageDetailActivity : AppCompatActivity() {
         etNote.setText(indexedImage?.note.orEmpty())
         renderCollectionChips(indexedImage?.id ?: 0L)
 
+        val classifierEntities = indexedImage?.textClassifierJson
+            ?.takeIf { it.isNotBlank() }
+            ?.let { TextClassifierService.decodeEntityResults(it) }
+            .orEmpty()
         applyTextClassifierPolicyToDetailTextViews()
+        renderEntityCards(classifierEntities)
+        renderScheduledReminders()
+    }
+
+    private fun renderScheduledReminders() {
+        scheduledRemindersAddChipGroup.removeAllViews()
+        scheduledRemindersChipGroup.removeAllViews()
+
+        if (currentImageId == 0L) {
+            tvScheduledRemindersLabel.visibility = View.GONE
+            scheduledRemindersContent.visibility = View.GONE
+            return
+        }
+
+        // Chip "+ Thêm" ở dòng riêng
+        val addChip = Chip(this).apply {
+            text = "+ Thêm"
+            isClickable = true
+            chipIcon = getDrawable(R.drawable.ic_alarm)
+            setOnClickListener {
+                showReminderDialog()
+            }
+        }
+        scheduledRemindersAddChipGroup.addView(addChip)
+
+        val reminders = ObjectBoxRepository.getPendingRemindersForImage(currentImageId)
+
+        tvScheduledRemindersLabel.visibility = View.VISIBLE
+        scheduledRemindersContent.visibility = View.VISIBLE
+
+        if (reminders.isEmpty()) {
+            tvNoReminders.visibility = View.VISIBLE
+            return
+        }
+
+        tvNoReminders.visibility = View.GONE
+
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy • HH:mm", Locale.getDefault())
+        reminders.forEach { reminder ->
+            val chip = Chip(this).apply {
+                text = "${reminder.title} • ${dateFormat.format(Date(reminder.reminderTime))}"
+                isClickable = true
+                isCheckable = false
+                chipIcon = getDrawable(R.drawable.ic_alarm)
+                isCloseIconVisible = true
+                setOnCloseIconClickListener {
+                    ReminderReceiver.cancelReminder(context, reminder.id)
+                    ObjectBoxRepository.deleteReminder(reminder.id)
+                    renderScheduledReminders()
+                }
+                setOnClickListener {
+                    showReminderDialogForExistingReminder(reminder)
+                }
+            }
+
+            scheduledRemindersChipGroup.addView(chip)
+        }
+    }
+
+    private fun showReminderDialogForExistingReminder(reminder: Reminder) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_reminder, null)
+        val etTitle = dialogView.findViewById<EditText>(R.id.etReminderTitle)
+        val etDate = dialogView.findViewById<EditText>(R.id.etReminderDate)
+        val etTime = dialogView.findViewById<EditText>(R.id.etReminderTime)
+        val etNote = dialogView.findViewById<EditText>(R.id.etReminderNote)
+
+        etTitle.setText(reminder.title)
+        etNote.setText(reminder.note ?: "")
+
+        val calendar = Calendar.getInstance().apply { timeInMillis = reminder.reminderTime }
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+        etDate.setText(dateFormat.format(calendar.time))
+        etTime.setText(timeFormat.format(calendar.time))
+
+        var selectedDate = calendar.time
+        var selectedHour = calendar.get(Calendar.HOUR_OF_DAY)
+        var selectedMinute = calendar.get(Calendar.MINUTE)
+
+        etDate.setOnClickListener {
+            val datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText(getString(R.string.reminder_date))
+                .setSelection(calendar.timeInMillis)
+                .build()
+
+            datePicker.addOnPositiveButtonClickListener { selection ->
+                selectedDate = Date(selection)
+                etDate.setText(dateFormat.format(selectedDate))
+            }
+
+            datePicker.show(supportFragmentManager, "datePicker")
+        }
+
+        etTime.setOnClickListener {
+            val timePicker = MaterialTimePicker.Builder()
+                .setHour(calendar.get(Calendar.HOUR_OF_DAY))
+                .setMinute(calendar.get(Calendar.MINUTE))
+                .setTitleText(getString(R.string.reminder_time))
+                .build()
+
+            timePicker.addOnPositiveButtonClickListener {
+                selectedHour = timePicker.hour
+                selectedMinute = timePicker.minute
+                etTime.setText(String.format("%02d:%02d", selectedHour, selectedMinute))
+            }
+
+            timePicker.show(supportFragmentManager, "timePicker")
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.edit_reminder)
+            .setView(dialogView)
+            .setPositiveButton(R.string.reminder_set) { _, _ ->
+                val title = etTitle.text?.toString()?.trim() ?: ""
+                if (title.isEmpty()) {
+                    Toast.makeText(this, R.string.reminder_empty_title, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val dateTime = Calendar.getInstance().apply {
+                    time = selectedDate
+                    set(Calendar.HOUR_OF_DAY, selectedHour)
+                    set(Calendar.MINUTE, selectedMinute)
+                    set(Calendar.SECOND, 0)
+                }.time
+
+                if (dateTime.time <= System.currentTimeMillis()) {
+                    Toast.makeText(this, R.string.reminder_time_invalid, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                reminder.title = title
+                reminder.reminderTime = dateTime.time
+                reminder.note = etNote.text?.toString()?.trim()?.takeIf { it.isNotEmpty() }
+                ObjectBoxRepository.putReminder(reminder)
+                ReminderReceiver.cancelReminder(this, reminder.id)
+                ReminderReceiver.scheduleReminder(this, reminder)
+                renderScheduledReminders()
+                Toast.makeText(this, R.string.reminder_updated, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .setNeutralButton(R.string.delete) { _, _ ->
+                ReminderReceiver.cancelReminder(this, reminder.id)
+                ObjectBoxRepository.deleteReminder(reminder.id)
+                renderScheduledReminders()
+            }
+            .show()
+    }
+
+    private fun renderEntityCards(entities: List<EntityResult>) {
+        entityCardsLinearLayout.removeAllViews()
+
+        if (entities.isEmpty()) {
+            tvEntitiesLabel.visibility = View.GONE
+            entityCardsContainer.visibility = View.GONE
+            return
+        }
+
+        tvEntitiesLabel.visibility = View.VISIBLE
+        entityCardsContainer.visibility = View.VISIBLE
+
+        // Entity types that use the new reminder system
+        val reminderEntityTypes = listOf("date", "dateTime", "datetime", "time")
+
+        for (entity in entities.distinctBy { it.text }) {
+            val cardView = layoutInflater.inflate(R.layout.item_entity_card, entityCardsLinearLayout, false)
+
+            val tvEntityType = cardView.findViewById<TextView>(R.id.tvEntityType)
+            val tvEntityValue = cardView.findViewById<TextView>(R.id.tvEntityValue)
+            val chipGroupActions = cardView.findViewById<ChipGroup>(R.id.chipGroupActions)
+
+            // Set entity type label and value
+            val typeLabel = getEntityTypeLabel(entity.entityType)
+            tvEntityType.text = typeLabel
+            tvEntityValue.text = entity.text
+
+            // For date/datetime/time entities: show calendar + alarm + reminder
+            if (entity.entityType in reminderEntityTypes) {
+                val actions = EntityActionHelper.buildActions(this, entity.entityType, entity.text)
+                for (action in actions) {
+                    val chip = Chip(this).apply {
+                        text = action.label
+                        isClickable = true
+                        action.iconRes?.let { setChipIconResource(it) }
+                        setOnClickListener {
+                            if (action.copyText != null) {
+                                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newPlainText("Copied", action.copyText)
+                                clipboard.setPrimaryClip(clip)
+                                Toast.makeText(this@ImageDetailActivity, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
+                            } else {
+                                try {
+                                    startActivity(action.intent)
+                                } catch (e: Exception) {
+                                    Toast.makeText(this@ImageDetailActivity, R.string.action_no_app, Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                    chipGroupActions.addView(chip)
+                }
+
+                // Add reminder chip
+                chipGroupActions.addView(createReminderChip(entity))
+            } else {
+                // For other entities: show existing actions (call, copy, etc.) + reminder
+                val actions = EntityActionHelper.buildActions(this, entity.entityType, entity.text)
+                for (action in actions) {
+                    val chip = Chip(this).apply {
+                        text = action.label
+                        isClickable = true
+                        setOnClickListener {
+                            if (action.copyText != null) {
+                                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newPlainText("Copied", action.copyText)
+                                clipboard.setPrimaryClip(clip)
+                                Toast.makeText(this@ImageDetailActivity, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show()
+                            } else {
+                                try {
+                                    startActivity(action.intent)
+                                } catch (e: Exception) {
+                                    Toast.makeText(this@ImageDetailActivity, R.string.action_no_app, Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                    chipGroupActions.addView(chip)
+                }
+
+                // Add reminder chip for all other entity types
+                chipGroupActions.addView(createReminderChip(entity))
+            }
+
+            entityCardsLinearLayout.addView(cardView)
+        }
+    }
+
+    private fun createReminderChip(entity: EntityResult): Chip {
+        return Chip(this).apply {
+            text = getString(R.string.action_reminder)
+            isClickable = true
+            chipIcon = getDrawable(R.drawable.ic_alarm)
+            setOnClickListener {
+                showReminderDialogWithEntity(entity)
+            }
+        }
+    }
+
+    private fun getEntityTypeLabel(entityType: String): String {
+        return when (entityType) {
+            "phone" -> "📞 Điện thoại"
+            "address" -> "📍 Địa chỉ"
+            "date" -> "📅 Ngày tháng"
+            "datetime" -> "⏰ Thời gian"
+            "email" -> "✉️ Email"
+            "url" -> "🔗 Liên kết"
+            "flightNumber" -> "✈️ Chuyến bay"
+            else -> "🏷️ Khác"
+        }
     }
 
     private fun renderCollectionChips(imageId: Long) {
@@ -391,5 +682,217 @@ class ImageDetailActivity : AppCompatActivity() {
             this,
             android.Manifest.permission.RECORD_AUDIO
         ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun hasNotificationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private var pendingReminderEntity: EntityResult? = null
+
+    private fun showReminderDialog() {
+        if (!hasNotificationPermission()) {
+            pendingReminderEntity = null
+            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 4002)
+            Toast.makeText(this, R.string.reminder_permission_required, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val indexedImage = currentUri?.let { ObjectBoxRepository.getByUri(it) } ?: return
+        val defaultTitle = indexedImage.note?.takeIf { it.isNotBlank() } ?: ""
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_reminder, null)
+        val etTitle = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etReminderTitle)
+        val etDate = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etReminderDate)
+        val etTime = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etReminderTime)
+        val etNote = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etReminderNote)
+
+        etTitle.setText(defaultTitle)
+
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(getString(R.string.reminder_date))
+            .build()
+        val timePicker = MaterialTimePicker.Builder()
+            .setTimeFormat(TimeFormat.CLOCK_24H)
+            .setTitleText(getString(R.string.reminder_time))
+            .build()
+
+        etDate.setOnClickListener {
+            datePicker.show(supportFragmentManager, "DATE_PICKER")
+            datePicker.addOnPositiveButtonClickListener {
+                val selection = datePicker.selection
+                if (selection != null) {
+                    val dateStr = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(selection))
+                    etDate.setText(dateStr)
+                }
+            }
+        }
+
+        etTime.setOnClickListener {
+            timePicker.show(supportFragmentManager, "TIME_PICKER")
+            timePicker.addOnPositiveButtonClickListener {
+                val hour = timePicker.hour.toString().padStart(2, '0')
+                val minute = timePicker.minute.toString().padStart(2, '0')
+                etTime.setText("$hour:$minute")
+            }
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.create_reminder)
+            .setView(dialogView)
+            .setPositiveButton(R.string.reminder_set) { _, _ ->
+                val title = etTitle.text?.toString() ?: ""
+                if (title.isBlank()) {
+                    Toast.makeText(this, R.string.reminder_empty_title, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                val dateStr = etDate.text?.toString() ?: ""
+                val timeStr = etTime.text?.toString() ?: ""
+                val note = etNote.text?.toString()?.takeIf { it.isNotBlank() }
+
+                if (dateStr.isBlank()) {
+                    Toast.makeText(this, R.string.reminder_empty_date, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                if (timeStr.isBlank()) {
+                    Toast.makeText(this, R.string.reminder_empty_time, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                createReminder(title, dateStr, timeStr, note)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun showReminderDialogWithEntity(entity: EntityResult) {
+        if (!hasNotificationPermission()) {
+            pendingReminderEntity = entity
+            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 4002)
+            Toast.makeText(this, R.string.reminder_permission_required, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val indexedImage = currentUri?.let { ObjectBoxRepository.getByUri(it) } ?: return
+
+        // Parse date/time from entity text
+        val calendar = Calendar.getInstance()
+        val parsedDate = EntityActionHelper.parseDateTime(entity.text)
+            ?: EntityActionHelper.parseDate(entity.text)
+        if (parsedDate != null) {
+            calendar.timeInMillis = parsedDate
+        } else {
+            // For non-date entities, default to tomorrow at same time to ensure future
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        val defaultTitle = indexedImage.note?.takeIf { it.isNotBlank() } ?: entity.text
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_reminder, null)
+        val etTitle = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etReminderTitle)
+        val etDate = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etReminderDate)
+        val etTime = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etReminderTime)
+        val etNote = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etReminderNote)
+
+        etTitle.setText(defaultTitle)
+
+        // Pre-fill date
+        val dateStr = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(calendar.timeInMillis))
+        etDate.setText(dateStr)
+
+        // Pre-fill time - try to parse from entity, otherwise use current time (already +1 day if no date)
+        val parsedTime = EntityActionHelper.parseTime(entity.text)
+        val (hour, minute) = parsedTime
+        etTime.setText("${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}")
+
+        val datePicker = MaterialDatePicker.Builder.datePicker()
+            .setTitleText(getString(R.string.reminder_date))
+            .setSelection(calendar.timeInMillis)
+            .build()
+        val timePicker = MaterialTimePicker.Builder()
+            .setTimeFormat(TimeFormat.CLOCK_24H)
+            .setHour(calendar.get(Calendar.HOUR_OF_DAY))
+            .setMinute(calendar.get(Calendar.MINUTE))
+            .setTitleText(getString(R.string.reminder_time))
+            .build()
+
+        etDate.setOnClickListener {
+            datePicker.show(supportFragmentManager, "DATE_PICKER")
+            datePicker.addOnPositiveButtonClickListener {
+                val selection = datePicker.selection
+                if (selection != null) {
+                    val dateStr = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(selection))
+                    etDate.setText(dateStr)
+                }
+            }
+        }
+
+        etTime.setOnClickListener {
+            timePicker.show(supportFragmentManager, "TIME_PICKER")
+            timePicker.addOnPositiveButtonClickListener {
+                val hour = timePicker.hour.toString().padStart(2, '0')
+                val minute = timePicker.minute.toString().padStart(2, '0')
+                etTime.setText("$hour:$minute")
+            }
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.create_reminder)
+            .setView(dialogView)
+            .setPositiveButton(R.string.reminder_set) { _, _ ->
+                val title = etTitle.text?.toString() ?: ""
+                if (title.isBlank()) {
+                    Toast.makeText(this, R.string.reminder_empty_title, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                val dateStr = etDate.text?.toString() ?: ""
+                val timeStr = etTime.text?.toString() ?: ""
+                val note = etNote.text?.toString()?.takeIf { it.isNotBlank() }
+
+                if (dateStr.isBlank()) {
+                    Toast.makeText(this, R.string.reminder_empty_date, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                if (timeStr.isBlank()) {
+                    Toast.makeText(this, R.string.reminder_empty_time, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                createReminder(title, dateStr, timeStr, note)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun createReminder(title: String, dateStr: String, timeStr: String, note: String?) {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+        val dateTimeStr = "$dateStr $timeStr"
+        val dateTime = dateFormat.parse(dateTimeStr)
+
+        if (dateTime == null || dateTime.time <= System.currentTimeMillis()) {
+            Toast.makeText(this, R.string.reminder_time_invalid, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val image = currentUri?.let { ObjectBoxRepository.getByUri(it) } ?: return
+
+        val reminder = Reminder(
+            imageId = image.id,
+            title = title,
+            note = note,
+            reminderTime = dateTime.time,
+            createdAt = System.currentTimeMillis()
+        )
+        val reminderId = ObjectBoxRepository.putReminder(reminder)
+
+        Log.d("Reminder", reminder.toString())
+
+        ReminderReceiver.scheduleReminder(applicationContext, reminder.copy(id = reminderId))
+
+        Toast.makeText(this, R.string.reminder_created, Toast.LENGTH_SHORT).show()
+        renderScheduledReminders()
     }
 }

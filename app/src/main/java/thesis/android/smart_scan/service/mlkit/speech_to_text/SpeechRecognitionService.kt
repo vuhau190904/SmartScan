@@ -56,7 +56,7 @@ object SpeechRecognitionService {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageTag)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, languageTag)
             // Force system recognizer to prefer offline pack (no network dependency).
-            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
+            putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false)
             putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3)
             putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
             // Give the recognizer more time before deciding user stopped talking.

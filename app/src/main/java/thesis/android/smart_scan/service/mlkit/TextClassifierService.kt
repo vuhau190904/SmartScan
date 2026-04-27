@@ -1,11 +1,14 @@
 package thesis.android.smart_scan.service.mlkit
 
 import android.content.Context
+import android.text.style.ClickableSpan
 import android.text.SpannableString
 import android.text.Spanned
+import android.text.TextPaint
 import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
+import android.view.View
 import android.util.Log
 import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextClassifier
@@ -82,6 +85,7 @@ object TextClassifierService {
         context: Context,
         fullText: String,
         entities: List<EntityResult>,
+        onEntityClick: (EntityResult) -> Unit
     ): CharSequence {
         if (fullText.isEmpty() || entities.isEmpty()) return fullText
         val highlightColor = ContextCompat.getColor(context, R.color.color_primary_container)
@@ -92,6 +96,21 @@ object TextClassifierService {
             compareBy({ it.key.first }, { it.key.second }),
         )) {
             val types = list.map { it.entityType }.toSet()
+            val clickableSpan = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    onEntityClick(list.first())
+                }
+                override fun updateDrawState(ds: TextPaint) {
+                    ds.isUnderlineText = types.any {
+                        it == TextClassifier.TYPE_PHONE || it == TextClassifier.TYPE_URL ||
+                        it == TextClassifier.TYPE_EMAIL || it == TextClassifier.TYPE_ADDRESS ||
+                        it == TextClassifier.TYPE_DATE || it == TextClassifier.TYPE_DATE_TIME ||
+                        it == TextClassifier.TYPE_FLIGHT_NUMBER
+                    }
+                    ds.color = linkColor
+                }
+            }
+            ss.setSpan(clickableSpan, range.first, range.second, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             applyEntitySpans(ss, types, range.first, range.second, highlightColor, linkColor)
         }
         return ss

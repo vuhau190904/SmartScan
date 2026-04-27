@@ -311,28 +311,83 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Entity Cards Section - displayed as horizontal scrollable chips/cards -->
             <TextView
-                android:id="@+id/tvOcrLabel"
+                android:id="@+id/tvEntitiesLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="@string/ocr_text"
+                android:layout_marginTop="16dp"
+                android:text="@string/extracted_entities"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0.06"
+                android:textAllCaps="true"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <HorizontalScrollView
+                android:id="@+id/entityCardsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:scrollbars="none"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:id="@+id/entityCardsLinearLayout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical" />
+
+            </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/tvScheduledRemindersLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/scheduled_reminders"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif-medium"
                 android:letterSpacing="0.06"
                 android:textAllCaps="true"
                 android:textColor="?attr/colorOnSurfaceVariant" />
 
-            <TextView
-                android:id="@+id/tvDetailOcrText"
+            <LinearLayout
+                android:id="@+id/scheduledRemindersContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif"
-                android:textColor="?attr/colorOnSurface"
-                android:textIsSelectable="true"
-                tools:text="Đây là nội dung văn bản được trích xuất từ OCR." />
+                android:layout_marginTop="8dp"
+                android:orientation="vertical">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/scheduledRemindersAddChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleLine="true" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/scheduledRemindersChipGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:singleLine="false"
+                    app:chipSpacingHorizontal="8dp"
+                    app:chipSpacingVertical="4dp" />
+
+                <TextView
+                    android:id="@+id/tvNoReminders"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/no_pending_reminders"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvDescriptionLabel"
