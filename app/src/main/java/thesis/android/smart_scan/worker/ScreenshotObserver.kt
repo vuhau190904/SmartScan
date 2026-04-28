@@ -11,11 +11,22 @@ import android.util.Log
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.google.common.cache.CacheBuilder
+import com.google.common.cache.CacheLoader
 import thesis.android.smart_scan.util.Constant
+import java.util.concurrent.TimeUnit
 
 class ScreenshotObserver(private val context: Context) : ContentObserver(handler) {
     companion object {
         private const val TAG = "ScreenshotObserver"
+
+        private val processedCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(10, TimeUnit.SECONDS)
+            .maximumSize(100)
+            .build(object : CacheLoader<String, Boolean>() {
+                override fun load(key: String) = true
+            })
+
         private val handler: Handler by lazy {
             val thread = HandlerThread("ScreenshotWatcher").apply { start() }
             Handler(thread.looper)
@@ -37,11 +48,19 @@ class ScreenshotObserver(private val context: Context) : ContentObserver(handler
 
     override fun onChange(selfChange: Boolean, uri: Uri?, flags: Int) {
         super.onChange(selfChange, uri)
-        if (uri != null) {
-            Handler(Looper.getMainLooper()).postDelayed({
-                scheduleScanWorker(uri)
-            }, 1000)
+        uri ?: return
+
+        val uriString = uri.toString()
+
+        if (processedCache.getIfPresent(uriString) != null) {
+            Log.d(TAG, "Bỏ qua duplicate: $uri")
+            return
         }
+
+        processedCache.put(uriString, true)
+        Handler(Looper.getMainLooper()).postDelayed({
+            scheduleScanWorker(uri)
+        }, 1000)
     }
 
     private fun scheduleScanWorker(uri: Uri) {

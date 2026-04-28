@@ -53,6 +53,7 @@ dependencies {
     implementation("com.google.mlkit:genai-image-description:1.0.0-beta1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.1")
+    implementation("com.google.guava:guava:32.1.3-android")
     implementation(libs.androidx.work.runtime.ktx)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     implementation("androidx.recyclerview:recyclerview:1.4.0")
