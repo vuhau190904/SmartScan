@@ -36,22 +36,22 @@ object ImageProcessor {
             Log.d(TAG, "OCR rỗng — vẫn tiếp tục index ảnh và phân collection theo object.")
         }
 
-//        val textToEmbed = try {
-//            val languageTag = LanguageIdentifyService.identify(text)
-//            Log.d(TAG, "Ngôn ngữ nhận dạng: $languageTag")
-//            val translated = TranslateService.translate(text, languageTag)
-//            Log.i(TAG, "Dịch xong [$languageTag → en]: Gốc='$text', Dịch='$translated'")
-//            translated
-//        } catch (e: Exception) {
-//            Log.w(TAG, "Nhận dạng ngôn ngữ thất bại, dùng văn bản gốc để embedding.", e)
-//            text
-//        }
+        val textToEmbed = try {
+            val languageTag = LanguageIdentifyService.identify(textOCR)
+            Log.d(TAG, "Ngôn ngữ nhận dạng: $languageTag")
+            val translated = TranslateService.translate(textOCR, languageTag)
+            Log.i(TAG, "Dịch xong [$languageTag → en]: Gốc='$textOCR', Dịch='$translated'")
+            translated
+        } catch (e: Exception) {
+            Log.w(TAG, "Nhận dạng ngôn ngữ thất bại, dùng văn bản gốc để embedding.", e)
+            textOCR
+        }
 
         val description = ImageDescriptionService.describeImage(context, uri)
         val descriptionText = description.getOrNull()?.trim().orEmpty()
         Log.d(TAG, "Mô tả ảnh: $descriptionText")
 
-        val embeddingOCR = TextEmbeddingService.embedText(textOCR)
+        val embeddingOCR = TextEmbeddingService.embedText(textToEmbed)
         Log.d(TAG, "Embedding xong — size=${embeddingOCR.size}")
 
         val embeddingDescription = descriptionText.takeIf { it.isNotBlank() }?.let {
