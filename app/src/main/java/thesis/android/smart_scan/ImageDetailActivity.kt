@@ -84,7 +84,6 @@ class ImageDetailActivity : AppCompatActivity() {
     private lateinit var btnSaveNote: MaterialButton
     private lateinit var chipGroupImageCollections: ChipGroup
     private lateinit var btnAddImageToCollection: MaterialButton
-    private lateinit var tvPageCounter: TextView
     private lateinit var tvEntitiesLabel: TextView
     private lateinit var entityCardsContainer: HorizontalScrollView
     private lateinit var entityCardsLinearLayout: LinearLayout
@@ -164,7 +163,6 @@ class ImageDetailActivity : AppCompatActivity() {
         btnSaveNote = findViewById(R.id.btnSaveNote)
         chipGroupImageCollections = findViewById(R.id.chipGroupImageCollections)
         btnAddImageToCollection = findViewById(R.id.btnAddImageToCollection)
-        tvPageCounter = findViewById(R.id.tvPageCounter)
         tvEntitiesLabel = findViewById(R.id.tvEntitiesLabel)
         entityCardsContainer = findViewById(R.id.entityCardsContainer)
         entityCardsLinearLayout = findViewById(R.id.entityCardsLinearLayout)
@@ -210,7 +208,6 @@ class ImageDetailActivity : AppCompatActivity() {
         viewPager.offscreenPageLimit = 2
         viewPager.setCurrentItem(startPosition, false)
 
-        updatePageCounter(startPosition + 1, uris.size)
         currentPosition = startPosition
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -218,7 +215,6 @@ class ImageDetailActivity : AppCompatActivity() {
                 if (bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN) {
                     bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 }
-                updatePageCounter(position + 1, uris.size)
                 currentPosition = position
             }
         })
@@ -283,10 +279,6 @@ class ImageDetailActivity : AppCompatActivity() {
             bottomSheet.setPadding(0, 0, 0, bars.bottom)
             insets
         }
-    }
-
-    private fun updatePageCounter(current: Int, total: Int) {
-        tvPageCounter.text = getString(R.string.page_counter, current, total)
     }
 
     private fun updateMetadata(uri: Uri) {
