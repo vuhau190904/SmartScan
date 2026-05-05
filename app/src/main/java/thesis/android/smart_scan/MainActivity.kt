@@ -141,6 +141,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         refreshCurrentView()
+        renderCollections()
     }
 
     // ── Initialization ─────────────────────────────────────────────────────
@@ -246,7 +247,10 @@ class MainActivity : AppCompatActivity() {
     private fun observeNewImages() {
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                ImageEventBus.newImageFlow.collect { refreshCurrentView() }
+                ImageEventBus.newImageFlow.collect {
+                    refreshCurrentView()
+                    renderCollections()
+                }
             }
         }
     }

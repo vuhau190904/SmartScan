@@ -4,5 +4,5 @@ import java.util.Locale
 
 data class AppConfig(
     val userLanguage: String = Locale.getDefault().language,
-    val objectDetectorScoreThreshold: Float = 0.8f,
+    val objectDetectorScoreThreshold: Float = 0.6f,
 )
