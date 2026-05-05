@@ -99,6 +99,11 @@ class CollectionDetailActivity : AppCompatActivity() {
         loadImages()
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) loadImages()
+    }
+
     private fun bindViews() {
         findViewById<ImageButton>(R.id.btnBackDetail).setOnClickListener { finish() }
         tvCollectionTitle = findViewById(R.id.tvCollectionTitle)
