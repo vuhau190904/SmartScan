@@ -304,6 +304,7 @@ class CollectionDetailActivity : AppCompatActivity() {
     private fun applyWindowInsets() {
         val root = findViewById<View>(R.id.collectionDetailRoot)
         val topContainer = findViewById<View>(R.id.topContainer)
+        val fabAddToCollection = findViewById<FloatingActionButton>(R.id.fabAddToCollection)
         val topPadding = topContainer.paddingTop
         val recyclerBottomPadding = rvCollectionDetailImages.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
@@ -320,6 +321,10 @@ class CollectionDetailActivity : AppCompatActivity() {
                 rvCollectionDetailImages.paddingRight,
                 recyclerBottomPadding + bars.bottom
             )
+            // Apply bottom margin to FAB to avoid gesture navigation bar
+            val fabParams = fabAddToCollection.layoutParams as androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
+            fabParams.bottomMargin = bars.bottom + 20
+            fabAddToCollection.layoutParams = fabParams
             insets
         }
     }

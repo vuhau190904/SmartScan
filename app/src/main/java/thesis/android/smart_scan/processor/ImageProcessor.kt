@@ -47,14 +47,27 @@ object ImageProcessor {
             textOCR
         }
 
+        val embeddingOCR = TextEmbeddingService.embedText(textToEmbed)
+        Log.d(TAG, "Embedding xong — size=${embeddingOCR.size}")
+
         val description = ImageDescriptionService.describeImage(context, uri)
         val descriptionText = description.getOrNull()?.trim().orEmpty()
         Log.d(TAG, "Mô tả ảnh: $descriptionText")
 
-        val embeddingOCR = TextEmbeddingService.embedText(textToEmbed)
-        Log.d(TAG, "Embedding xong — size=${embeddingOCR.size}")
+        val collections = detectObject(uri)
 
-        val embeddingDescription = descriptionText.takeIf { it.isNotBlank() }?.let {
+        val objectsSentence = if (collections.isNotEmpty()) {
+            "The image contains: ${collections.joinToString(", ")}."
+        } else {
+            ""
+        }
+
+        val finalDescription = listOf(objectsSentence, descriptionText)
+            .filter { it.isNotBlank() }
+            .joinToString(". ")
+            .takeIf { it.isNotBlank() }
+
+        val embeddingDescription = finalDescription?.let {
             TextEmbeddingService.embedText(it)
         }
 
@@ -64,36 +77,38 @@ object ImageProcessor {
             embeddingDescription = embeddingDescription,
             ocrText = textOCR,
             textClassifierJson = textClassifierJson,
-            imageDescription = descriptionText.ifBlank { null },
+            imageDescription = finalDescription,
             updatedAt = System.currentTimeMillis()
         )
         val imageId = ObjectBoxRepository.put(image)
 
-        assignImageToObjectCollections(uri, imageId)
+        assignImageToObjectCollections(collections, imageId)
     }
 
-    private suspend fun assignImageToObjectCollections(uri: Uri, imageId: Long) {
+    private suspend fun detectObject(uri: Uri): List<String> {
         val objectsResult = runCatching { ObjectExtractionService.detectObjects(uri) }
             .getOrElse { e ->
                 Log.w(TAG, "Object extraction không chạy được: ${e.message}", e)
-                return
+                return emptyList<String>()
             }
 
         val objects = objectsResult.getOrElse { e ->
             Log.w(TAG, "detectObjects thất bại: ${e.message}", e)
-            return
+            return emptyList<String>()
         }
 
         if (objects.isEmpty()) {
             Log.d(TAG, "Không có object nào để gán collection.")
-            return
+            return emptyList<String>()
         }
 
-        val distinctLabels = objects
+        return objects
             .map { it.label.trim() }
             .filter { it.isNotEmpty() }
             .distinctBy { it.lowercase(Locale.getDefault()) }
+    }
 
+    private fun assignImageToObjectCollections(distinctLabels: List<String>, imageId: Long) {
         for (label in distinctLabels) {
             val collection = ObjectBoxRepository.getOrCreateCollectionForLabel(label)
             if (collection == null) {
