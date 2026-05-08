@@ -231,6 +231,8 @@ class ImageDetailActivity : AppCompatActivity() {
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                        // Show both system bars and back button when viewing metadata
+                        showSystemUI()
                         // Skip if already loading (swipe gesture handled loading)
                         if (isMetadataLoading) return
                         val uris = resolveUris() ?: return
@@ -245,8 +247,40 @@ class ImageDetailActivity : AppCompatActivity() {
         }
     }
 
+    private var isUIVisible = true
+    private fun showSystemUI() {
+        isUIVisible = true
+        val decorView = window.decorView
+        val controller = androidx.core.view.WindowCompat.getInsetsController(window, decorView)
+        controller.show(android.view.WindowInsets.Type.systemBars())
+        controller.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        findViewById<ImageButton>(R.id.btnBack).visibility = View.VISIBLE
+    }
+
+    private fun toggleSystemUI() {
+        isUIVisible = !isUIVisible
+        val decorView = window.decorView
+        val controller = androidx.core.view.WindowCompat.getInsetsController(window, decorView)
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+        if (isUIVisible) {
+            controller.show(android.view.WindowInsets.Type.systemBars())
+            backButton.visibility = View.VISIBLE
+        } else {
+            controller.hide(android.view.WindowInsets.Type.systemBars())
+            controller.systemBarsBehavior = androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            backButton.visibility = View.GONE
+        }
+    }
+
     private fun setupSwipeUpGesture() {
         gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                    toggleSystemUI()
+                }
+                return true
+            }
+
             override fun onFling(
                 e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float
             ): Boolean {
@@ -358,7 +392,7 @@ class ImageDetailActivity : AppCompatActivity() {
         val addChip = Chip(this).apply {
             text = "+ Thêm"
             isClickable = true
-            chipIcon = getDrawable(R.drawable.ic_alarm)
+            chipIcon = getDrawable(R.drawable.ic_bell)
             setOnClickListener {
                 showReminderDialog()
             }
@@ -383,7 +417,7 @@ class ImageDetailActivity : AppCompatActivity() {
                 text = "${reminder.title} • ${dateFormat.format(Date(reminder.reminderTime))}"
                 isClickable = true
                 isCheckable = false
-                chipIcon = getDrawable(R.drawable.ic_alarm)
+                chipIcon = getDrawable(R.drawable.ic_bell)
                 isCloseIconVisible = true
                 setOnCloseIconClickListener {
                     ReminderReceiver.cancelReminder(context, reminder.id)
@@ -582,7 +616,7 @@ class ImageDetailActivity : AppCompatActivity() {
         return Chip(this).apply {
             text = getString(R.string.action_reminder)
             isClickable = true
-            chipIcon = getDrawable(R.drawable.ic_alarm)
+            chipIcon = getDrawable(R.drawable.ic_bell)
             setOnClickListener {
                 showReminderDialogWithEntity(entity)
             }
@@ -856,6 +890,7 @@ class ImageDetailActivity : AppCompatActivity() {
             .setHour(calendar.get(Calendar.HOUR_OF_DAY))
             .setMinute(calendar.get(Calendar.MINUTE))
             .setTitleText(getString(R.string.reminder_time))
+            .setInputMode(MaterialTimePicker.INPUT_MODE_CLOCK)
             .build()
 
         etDate.setOnClickListener {
