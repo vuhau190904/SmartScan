@@ -13,63 +13,74 @@ import thesis.android.smart_scan.service.mlkit.TextClassifierService
 import thesis.android.smart_scan.service.mlkit.TextEmbeddingService
 import thesis.android.smart_scan.service.mlkit.TranslateService
 import java.util.Locale
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 object ImageProcessor {
 
     private const val TAG = "ImageProcessor"
 
-    suspend fun process(context: Context, uri: Uri) {
+    suspend fun process(context: Context, uri: Uri)= coroutineScope {
         Log.d(TAG, "Bắt đầu xử lý ảnh: $uri")
 
-        val textOCR = OCRService.recognizeFromUri(uri)
-        Log.d(TAG, "OCR xong — $textOCR")
+        val ocrJob = async {
+            val textOCR = OCRService.recognizeFromUri(uri)
+            Log.d(TAG, "OCR xong — $textOCR")
 
-        val classifierEntities = if (textOCR.isNotBlank()) {
-            TextClassifierService.extractMetadata(textOCR)
-        } else {
-            emptyList()
-        }
-        val textClassifierJson = TextClassifierService.encodeEntityResults(classifierEntities)
-        Log.d(TAG, "TextClassifier: ${classifierEntities}")
+            val classifierEntities = if (textOCR.isNotBlank()) {
+                TextClassifierService.extractMetadata(textOCR)
+            } else {
+                emptyList()
+            }
+            val textClassifierJson = TextClassifierService.encodeEntityResults(classifierEntities)
+            Log.d(TAG, "TextClassifier: ${classifierEntities}")
 
-        if (textOCR.isBlank()) {
-            Log.d(TAG, "OCR rỗng — vẫn tiếp tục index ảnh và phân collection theo object.")
-        }
+            if (textOCR.isBlank()) {
+                Log.d(TAG, "OCR rỗng — vẫn tiếp tục index ảnh và phân collection theo object.")
+            }
 
-        val textToEmbed = try {
-            val languageTag = LanguageIdentifyService.identify(textOCR)
-            Log.d(TAG, "Ngôn ngữ nhận dạng: $languageTag")
-            val translated = TranslateService.translate(textOCR, languageTag)
-            Log.i(TAG, "Dịch xong [$languageTag → en]: Gốc='$textOCR', Dịch='$translated'")
-            translated
-        } catch (e: Exception) {
-            Log.w(TAG, "Nhận dạng ngôn ngữ thất bại, dùng văn bản gốc để embedding.", e)
-            textOCR
-        }
+            val textToEmbed = try {
+                val languageTag = LanguageIdentifyService.identify(textOCR)
+                Log.d(TAG, "Ngôn ngữ nhận dạng: $languageTag")
+                val translated = TranslateService.translate(textOCR, languageTag)
+                Log.i(TAG, "Dịch xong [$languageTag → en]: Gốc='$textOCR', Dịch='$translated'")
+                translated
+            } catch (e: Exception) {
+                Log.w(TAG, "Nhận dạng ngôn ngữ thất bại, dùng văn bản gốc để embedding.", e)
+                textOCR
+            }
 
-        val embeddingOCR = TextEmbeddingService.embedText(textToEmbed)
-        Log.d(TAG, "Embedding xong — size=${embeddingOCR.size}")
-
-        val description = ImageDescriptionService.describeImage(context, uri)
-        val descriptionText = description.getOrNull()?.trim().orEmpty()
-        Log.d(TAG, "Mô tả ảnh: $descriptionText")
-
-        val collections = detectObject(uri)
-
-        val objectsSentence = if (collections.isNotEmpty()) {
-            "The image contains: ${collections.joinToString(", ")}."
-        } else {
-            ""
+            val embeddingOCR = TextEmbeddingService.embedText(textToEmbed)
+            Log.d(TAG, "Embedding xong — size=${embeddingOCR.size}")
+            Triple(textOCR, textClassifierJson, embeddingOCR)
         }
 
-        val finalDescription = listOf(objectsSentence, descriptionText)
-            .filter { it.isNotBlank() }
-            .joinToString(". ")
-            .takeIf { it.isNotBlank() }
+        val imageJob = async {
+            val description = ImageDescriptionService.describeImage(context, uri)
+            val descriptionText = description.getOrNull()?.trim().orEmpty()
+            Log.d(TAG, "Mô tả ảnh: $descriptionText")
 
-        val embeddingDescription = finalDescription?.let {
-            TextEmbeddingService.embedText(it)
+            val collections = detectObject(uri)
+
+            val objectsSentence = if (collections.isNotEmpty()) {
+                "The image contains: ${collections.joinToString(", ")}."
+            } else {
+                ""
+            }
+
+            val finalDescription = listOf(objectsSentence, descriptionText)
+                .filter { it.isNotBlank() }
+                .joinToString(". ")
+                .takeIf { it.isNotBlank() }
+
+            val embeddingDescription = finalDescription?.let {
+                TextEmbeddingService.embedText(it)
+            }
+            Triple(finalDescription, embeddingDescription, collections)
         }
+
+        val (textOCR, textClassifierJson, embeddingOCR) = ocrJob.await()
+        val (finalDescription, embeddingDescription, collections) = imageJob.await()
 
         val image = Image(
             uri = uri,

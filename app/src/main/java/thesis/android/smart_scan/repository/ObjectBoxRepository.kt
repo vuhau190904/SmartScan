@@ -13,6 +13,9 @@ import thesis.android.smart_scan.model.Image_
 import thesis.android.smart_scan.model.MyObjectBox
 import thesis.android.smart_scan.model.Reminder
 import thesis.android.smart_scan.model.Reminder_
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 object                                                                                                                                                                                                                                                                                                          ObjectBoxRepository {
     lateinit var store: BoxStore
@@ -195,7 +198,7 @@ object                                                                          
         return images
     }
 
-    fun search(queryVector: FloatArray, limit: Int): List<Uri> {
+    suspend fun search(queryVector: FloatArray, limit: Int): List<Uri> = coroutineScope {
         val queryOCR = imageBox.query()
             .nearestNeighbors(Image_.embeddingOCR, queryVector, limit)
             .build()
@@ -204,7 +207,18 @@ object                                                                          
             .nearestNeighbors(Image_.embeddingDescription, queryVector, limit)
             .build()
 
-        val finalUris = (queryOCR.findWithScores() + queryDesc.findWithScores())
+        val ocrDeferred = async(Dispatchers.IO) {
+            queryOCR.findWithScores()
+        }
+
+        val descDeferred = async(Dispatchers.IO) {
+            queryDesc.findWithScores()
+        }
+
+        val ocrResults = ocrDeferred.await()
+        val descResults = descDeferred.await()
+
+        val finalUris = (ocrResults + descResults)
             .filter { it.score <= 0.3 }
             .groupBy { it.get().id }
             .map { (_, results) ->
@@ -217,7 +231,7 @@ object                                                                          
         queryOCR.close()
         queryDesc.close()
 
-        return finalUris
+        return@coroutineScope finalUris
     }
 
     fun getUrisPaged(offset: Long, limit: Long): List<Uri> {
