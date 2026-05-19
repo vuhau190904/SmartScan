@@ -44,15 +44,6 @@
             android:minHeight="40dp" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvPickerSubtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/select_images_to_add"
-        android:textSize="13sp"
-        android:textColor="?attr/colorOnSurfaceVariant" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPickerImages"
         android:layout_width="match_parent"

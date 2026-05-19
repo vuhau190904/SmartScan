@@ -12,7 +12,8 @@ import thesis.android.smart_scan.model.Image
 
 class CollectionDetailImageAdapter(
     private val onImageClick: (Image) -> Unit,
-    private val onImageLongClick: (Image) -> Unit
+    private val onImageLongClick: (Image) -> Unit,
+    private val onSelectionChanged: () -> Unit
 ) : RecyclerView.Adapter<CollectionDetailImageAdapter.DetailViewHolder>() {
 
     private val items = mutableListOf<Image>()
@@ -62,10 +63,12 @@ class CollectionDetailImageAdapter(
     override fun getItemCount(): Int = items.size
 
     fun submitItems(images: List<Image>) {
+        val previousSelectedCount = selectedIds.size
         items.clear()
         items.addAll(images)
         selectedIds.retainAll(images.map { it.id }.toSet())
         notifyDataSetChanged()
+        if (selectedIds.size != previousSelectedCount) onSelectionChanged()
     }
 
     fun setSelectionMode(enabled: Boolean) {
@@ -75,13 +78,16 @@ class CollectionDetailImageAdapter(
     }
 
     fun select(imageId: Long) {
-        selectedIds.add(imageId)
-        notifyDataSetChanged()
+        if (selectedIds.add(imageId)) {
+            notifyDataSetChanged()
+            onSelectionChanged()
+        }
     }
 
     fun toggleSelection(imageId: Long) {
         if (imageId in selectedIds) selectedIds.remove(imageId) else selectedIds.add(imageId)
         notifyDataSetChanged()
+        onSelectionChanged()
     }
 
     fun getSelectedIds(): Set<Long> = selectedIds

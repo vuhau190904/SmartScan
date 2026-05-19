@@ -66,6 +66,14 @@
                     android:contentDescription="@string/delete_collection"
                     app:tint="?attr/colorError" />
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRemoveFromCollection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="40dp"
+                    android:text="@string/remove_from_collection"
+                    android:visibility="gone" />
+
             </LinearLayout>
 
             <LinearLayout
@@ -110,31 +118,6 @@
                     android:padding="6dp"
                     android:src="@android:drawable/ic_btn_speak_now"
                     app:tint="?attr/colorOnSurfaceVariant" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/selectionBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/tvSelectedCount"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="13sp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnRemoveFromCollection"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/remove_from_collection" />
             </LinearLayout>
 
         </LinearLayout>

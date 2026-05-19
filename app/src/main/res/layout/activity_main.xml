@@ -218,15 +218,6 @@
                 android:gravity="center"
                 android:lineSpacingExtra="4dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/empty_subtitle"
-                android:textSize="13sp"
-                android:textColor="?attr/colorOutline"
-                android:gravity="center" />
-
         </LinearLayout>
 
         <!-- Staggered image grid -->

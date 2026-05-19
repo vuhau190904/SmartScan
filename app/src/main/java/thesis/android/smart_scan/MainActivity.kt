@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
         private const val PAGE_SIZE = 30L
         private const val PREFETCH_DISTANCE = 8
-        private const val SEARCH_DEBOUNCE_MS = 400L
+        private const val SEARCH_DEBOUNCE_MS = 500L
         private const val GRID_SPAN_COUNT = 3
         private const val GRID_SPACING_DP = 6
         private const val REQUEST_RECORD_AUDIO = 2001

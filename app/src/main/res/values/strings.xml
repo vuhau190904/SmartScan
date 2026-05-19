@@ -7,7 +7,6 @@
     <string name="no_results">No results found</string>
     <string name="all_images">%d images saved</string>
     <string name="no_indexed_images">No images saved yet</string>
-    <string name="empty_subtitle">Images will appear here after being scanned</string>
     <string name="loading">Searching…</string>
     <string name="back">Back</string>
     <string name="date_added">Date added</string>
@@ -43,13 +42,11 @@
     <string name="uncategorized_images_count">Uncategorized: %1$d images</string>
     <string name="no_uncategorized_images">No uncategorized images</string>
     <string name="add">Add</string>
-    <string name="select_images_to_add">Select images not yet in the collection to add</string>
     <string name="select_at_least_one_image">Please select at least one image</string>
     <string name="add_selected_count">Add (%1$d)</string>
     <string name="add_images_to_collection_title">Add to %1$s</string>
     <string name="search_in_collection_hint">Search in this collection…</string>
-    <string name="remove_from_collection">Remove from collection</string>
-    <string name="selected_count">%1$d images selected</string>
+    <string name="remove_from_collection">Remove</string>
     <string name="delete_collection_keep_images_confirm">Do you want to delete this collection?</string>
     <string name="create_collection_with_plus">+ Create new collection</string>
     <string name="unknown">Unknown</string>

@@ -6,7 +6,10 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
@@ -24,6 +27,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import thesis.android.smart_scan.adapter.CollectionDetailImageAdapter
@@ -37,16 +42,20 @@ import thesis.android.smart_scan.util.inflateDialogTextInput
 
 class CollectionDetailActivity : AppCompatActivity() {
 
+    companion object {
+        private const val TAG = "CollectionDetailActivity"
+        private const val SEARCH_DEBOUNCE_MS = 1000L
+    }
+
     private lateinit var tvCollectionTitle: TextView
     private lateinit var etCollectionSearch: EditText
     private lateinit var btnVoiceCollectionSearch: ImageButton
+    private lateinit var searchContainer: View
     private lateinit var rvCollectionDetailImages: RecyclerView
     private lateinit var tvDetailEmpty: TextView
-    private lateinit var selectionBar: View
-    private lateinit var tvSelectedCount: TextView
-    private lateinit var btnRemoveFromCollection: MaterialButton
     private lateinit var btnEditCollection: ImageButton
     private lateinit var btnDeleteCollection: ImageButton
+    private lateinit var btnRemoveFromCollection: MaterialButton
     private lateinit var fabAddToCollection: FloatingActionButton
 
     private lateinit var adapter: CollectionDetailImageAdapter
@@ -57,6 +66,8 @@ class CollectionDetailActivity : AppCompatActivity() {
     private var isSelectionMode = false
     private var currentQuery = ""
     private var isVoiceSearching = false
+    private var searchJob: Job? = null
+    private var loadImagesJob: Job? = null
 
     private lateinit var speechRecognitionDelegate: SpeechRecognitionDelegate
 
@@ -65,7 +76,7 @@ class CollectionDetailActivity : AppCompatActivity() {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             setResult(Activity.RESULT_OK)
-            loadImages()
+            refreshCollectionImages()
         }
     }
 
@@ -74,7 +85,7 @@ class CollectionDetailActivity : AppCompatActivity() {
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             setResult(Activity.RESULT_OK)
-            loadImages()
+            refreshCollectionImages()
         }
     }
 
@@ -96,26 +107,25 @@ class CollectionDetailActivity : AppCompatActivity() {
         setupActions()
         setupSearch()
         applyWindowInsets()
-        loadImages()
+        refreshCollectionImages()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) loadImages()
+        if (hasFocus) refreshCollectionImages()
     }
 
     private fun bindViews() {
         findViewById<ImageButton>(R.id.btnBackDetail).setOnClickListener { finish() }
         tvCollectionTitle = findViewById(R.id.tvCollectionTitle)
+        searchContainer = findViewById(R.id.searchContainer)
         etCollectionSearch = findViewById(R.id.etCollectionSearch)
         btnVoiceCollectionSearch = findViewById(R.id.btnVoiceCollectionSearch)
         rvCollectionDetailImages = findViewById(R.id.rvCollectionDetailImages)
         tvDetailEmpty = findViewById(R.id.tvDetailEmpty)
-        selectionBar = findViewById(R.id.selectionBar)
-        tvSelectedCount = findViewById(R.id.tvSelectedCount)
-        btnRemoveFromCollection = findViewById(R.id.btnRemoveFromCollection)
         btnEditCollection = findViewById(R.id.btnEditCollection)
         btnDeleteCollection = findViewById(R.id.btnDeleteCollection)
+        btnRemoveFromCollection = findViewById(R.id.btnRemoveFromCollection)
         fabAddToCollection = findViewById(R.id.fabAddToCollection)
         tvCollectionTitle.text = collectionName
     }
@@ -132,6 +142,9 @@ class CollectionDetailActivity : AppCompatActivity() {
                 }
                 adapter.select(image.id)
                 updateSelectionUI()
+            },
+            onSelectionChanged = {
+                updateSelectionUI()
             }
         )
         rvCollectionDetailImages.layoutManager = GridLayoutManager(this, 3)
@@ -142,13 +155,7 @@ class CollectionDetailActivity : AppCompatActivity() {
         btnEditCollection.setOnClickListener { showRenameDialog() }
         btnDeleteCollection.setOnClickListener { showDeleteDialog() }
         btnRemoveFromCollection.setOnClickListener { removeSelectedImages() }
-        fabAddToCollection.setOnClickListener {
-            val intent = Intent(this, CollectionPickerActivity::class.java).apply {
-                putExtra(Constant.COLLECTION_ID, collectionId)
-                putExtra(Constant.COLLECTION_NAME, collectionName)
-            }
-            pickerLauncher.launch(intent)
-        }
+        fabAddToCollection.setOnClickListener { openCollectionPicker() }
     }
 
     private fun setupSearch() {
@@ -161,9 +168,30 @@ class CollectionDetailActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 currentQuery = s?.toString()?.trim().orEmpty()
-                loadImages()
+                searchJob?.cancel()
+                if (currentQuery.isBlank()) {
+                    loadCollectionImages()
+                } else {
+                    val query = currentQuery
+                    searchJob = lifecycleScope.launch {
+                        delay(SEARCH_DEBOUNCE_MS)
+                        performCollectionSearch(query)
+                    }
+                }
             }
         })
+
+        etCollectionSearch.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                searchJob?.cancel()
+                currentQuery = etCollectionSearch.text?.toString()?.trim().orEmpty()
+                refreshCollectionImages()
+                hideCollectionSearchKeyboard()
+                true
+            } else {
+                false
+            }
+        }
     }
 
     private fun startVoiceSearchInCollection() {
@@ -205,24 +233,58 @@ class CollectionDetailActivity : AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun loadImages() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val all = ObjectBoxRepository.getImagesByCollection(collectionId, 0L, ObjectBoxRepository.count())
-            val filtered = if (currentQuery.isBlank()) {
-                all
-            } else {
-                val resultUris = SearchProcessor.search(currentQuery).toSet()
+    private fun refreshCollectionImages() {
+        val query = currentQuery
+        if (query.isBlank()) {
+            loadCollectionImages()
+        } else {
+            performCollectionSearch(query)
+        }
+    }
+
+    private fun loadCollectionImages() {
+        loadImagesJob?.cancel()
+        loadImagesJob = lifecycleScope.launch {
+            val images = withContext(Dispatchers.IO) {
+                ObjectBoxRepository.getImagesByCollection(
+                    collectionId,
+                    0L,
+                    ObjectBoxRepository.count()
+                )
+            }
+            if (currentQuery.isNotBlank()) return@launch
+            renderImages(images, isSearchResult = false)
+        }
+    }
+
+    private fun performCollectionSearch(query: String) {
+        loadImagesJob?.cancel()
+        loadImagesJob = lifecycleScope.launch {
+            val filtered = withContext(Dispatchers.IO) {
+                val all = ObjectBoxRepository.getImagesByCollection(
+                    collectionId,
+                    0L,
+                    ObjectBoxRepository.count()
+                )
+                Log.d(TAG, "Calling SearchProcessor.search for collectionId=$collectionId, query='$query'")
+                val resultUris = SearchProcessor.search(query).toSet()
                 all.filter { it.uri in resultUris }
             }
-            withContext(Dispatchers.Main) {
-                currentItems = filtered
-                adapter.submitItems(filtered)
-                tvDetailEmpty.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
-                rvCollectionDetailImages.visibility = if (filtered.isEmpty()) View.GONE else View.VISIBLE
-                if (filtered.isEmpty() && isSelectionMode) clearSelectionMode()
-                updateSelectionUI()
-            }
+            if (query != currentQuery) return@launch
+            renderImages(filtered, isSearchResult = true)
         }
+    }
+
+    private fun renderImages(images: List<Image>, isSearchResult: Boolean) {
+        currentItems = images
+        adapter.submitItems(images)
+        tvDetailEmpty.text = getString(
+            if (isSearchResult) R.string.no_results else R.string.no_images_in_collection
+        )
+        tvDetailEmpty.visibility = if (images.isEmpty()) View.VISIBLE else View.GONE
+        rvCollectionDetailImages.visibility = if (images.isEmpty()) View.GONE else View.VISIBLE
+        if (images.isEmpty() && isSelectionMode) clearSelectionMode()
+        updateSelectionUI()
     }
 
     private fun removeSelectedImages() {
@@ -236,7 +298,7 @@ class CollectionDetailActivity : AppCompatActivity() {
         }
         setResult(Activity.RESULT_OK)
         clearSelectionMode()
-        loadImages()
+        refreshCollectionImages()
     }
 
     private fun clearSelectionMode() {
@@ -247,12 +309,32 @@ class CollectionDetailActivity : AppCompatActivity() {
 
     private fun updateSelectionUI() {
         val selectedCount = adapter.getSelectedIds().size
-        selectionBar.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
-        tvSelectedCount.text = getString(R.string.selected_count, selectedCount)
-        btnEditCollection.visibility = if (isSelectionMode) View.GONE else View.VISIBLE
-        btnDeleteCollection.visibility = if (isSelectionMode) View.GONE else View.VISIBLE
-        fabAddToCollection.visibility = if (isSelectionMode) View.GONE else View.VISIBLE
-        if (isSelectionMode && selectedCount == 0) clearSelectionMode()
+        if (isSelectionMode && selectedCount == 0) {
+            isSelectionMode = false
+            adapter.setSelectionMode(false)
+        }
+
+        val hasSelection = selectedCount > 0
+        if (hasSelection) hideCollectionSearchKeyboard()
+        searchContainer.visibility = if (hasSelection) View.GONE else View.VISIBLE
+        btnEditCollection.visibility = if (hasSelection) View.GONE else View.VISIBLE
+        btnDeleteCollection.visibility = if (hasSelection) View.GONE else View.VISIBLE
+        btnRemoveFromCollection.visibility = if (hasSelection) View.VISIBLE else View.GONE
+        fabAddToCollection.visibility = if (hasSelection) View.GONE else View.VISIBLE
+    }
+
+    private fun openCollectionPicker() {
+        val intent = Intent(this, CollectionPickerActivity::class.java).apply {
+            putExtra(Constant.COLLECTION_ID, collectionId)
+            putExtra(Constant.COLLECTION_NAME, collectionName)
+        }
+        pickerLauncher.launch(intent)
+    }
+
+    private fun hideCollectionSearchKeyboard() {
+        etCollectionSearch.clearFocus()
+        getSystemService(InputMethodManager::class.java)
+            ?.hideSoftInputFromWindow(etCollectionSearch.windowToken, 0)
     }
 
     private fun showRenameDialog() {
@@ -329,4 +411,3 @@ class CollectionDetailActivity : AppCompatActivity() {
         }
     }
 }
-

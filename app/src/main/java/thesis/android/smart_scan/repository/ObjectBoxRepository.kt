@@ -219,7 +219,7 @@ object                                                                          
         val descResults = descDeferred.await()
 
         val finalUris = (ocrResults + descResults)
-            .filter { it.score <= 0.3 }
+              .filter { it.score <= 0.15 }
             .groupBy { it.get().id }
             .map { (_, results) ->
                 results.minBy { it.score }
