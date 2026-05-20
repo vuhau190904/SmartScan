@@ -56,6 +56,7 @@ import thesis.android.smart_scan.service.mlkit.TranslateService
 import thesis.android.smart_scan.util.Constant
 import thesis.android.smart_scan.util.inflateDialogTextInput
 import thesis.android.smart_scan.util.ImageEventBus
+import thesis.android.smart_scan.util.PerformanceLogger
 import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
@@ -100,12 +101,20 @@ class MainActivity : AppCompatActivity() {
     private var searchResultsCache: List<Uri> = emptyList()
     private var searchPageOffset = 0
     private var isVoiceSearching = false
+    private var appOpenStartedAtMs = 0L
+    private var shouldMeasureStartup = false
+    private var startupLogged = false
+    private var startupContentRendered = false
+    private var criticalServicesInitialized = false
+    private var hasCompletedInitialForeground = false
+    private var internalNavigationInProgress = false
 
     private lateinit var speechRecognitionDelegate: SpeechRecognitionDelegate
 
     private val imageDetailLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
+        internalNavigationInProgress = false
         if (result.resultCode == Activity.RESULT_OK) {
             refreshCurrentView()
             renderCollections()
@@ -116,6 +125,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        appOpenStartedAtMs = PerformanceLogger.now()
+        shouldMeasureStartup = savedInstanceState == null
         speechRecognitionDelegate = SpeechRecognitionDelegate(this)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
@@ -140,8 +151,29 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        refreshCurrentView()
-        renderCollections()
+        if (!hasCompletedInitialForeground) {
+            hasCompletedInitialForeground = true
+            refreshCurrentView()
+            renderCollections()
+            return
+        }
+
+        if (internalNavigationInProgress) {
+            refreshCurrentView()
+            renderCollections()
+            return
+        }
+
+        val reopenStartedAtMs = PerformanceLogger.now()
+        refreshCurrentView {
+            renderCollections()
+            PerformanceLogger.logDuration(
+                PerformanceLogger.TAG_STARTUP,
+                "app_open_response",
+                reopenStartedAtMs,
+                "condition=foreground_reopen initial_screen=rendered"
+            )
+        }
     }
 
     // ── Initialization ─────────────────────────────────────────────────────
@@ -174,6 +206,7 @@ class MainActivity : AppCompatActivity() {
                 putExtra(Constant.COLLECTION_ID, collection.id)
                 putExtra(Constant.COLLECTION_NAME, collection.name)
             }
+            internalNavigationInProgress = true
             imageDetailLauncher.launch(intent)
         }
         rvCollections.apply {
@@ -212,6 +245,7 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 searchJob?.cancel()
                 val query = s?.toString()?.trim().orEmpty()
+                val latencyStartedAtMs = PerformanceLogger.now()
                 if (query.isEmpty()) {
                     setCollectionsVisible(true)
                     resetAndLoadAll()
@@ -219,7 +253,7 @@ class MainActivity : AppCompatActivity() {
                     setCollectionsVisible(false)
                     searchJob = lifecycleScope.launch {
                         delay(SEARCH_DEBOUNCE_MS)
-                        performSearch(query)
+                        performSearch(query, latencyStartedAtMs = latencyStartedAtMs)
                     }
                 }
             }
@@ -235,7 +269,7 @@ class MainActivity : AppCompatActivity() {
                     resetAndLoadAll()
                 } else {
                     setCollectionsVisible(false)
-                    performSearch(query)
+                    performSearch(query, latencyStartedAtMs = PerformanceLogger.now())
                 }
                 true
             } else false
@@ -247,25 +281,32 @@ class MainActivity : AppCompatActivity() {
     private fun observeNewImages() {
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                ImageEventBus.newImageFlow.collect {
-                    refreshCurrentView()
-                    renderCollections()
+                ImageEventBus.newImageFlow.collect { event ->
+                    refreshCurrentView {
+                        renderCollections()
+                        PerformanceLogger.logDuration(
+                            PerformanceLogger.TAG_PROCESSING_TIME,
+                            "pipeline_total_until_main_ui_update",
+                            event.processingStartedAtMs,
+                            "uri=${event.uri}"
+                        )
+                    }
                 }
             }
         }
     }
 
-    private fun refreshCurrentView() {
+    private fun refreshCurrentView(onRendered: (() -> Unit)? = null) {
         if (isSearchMode && currentQuery.isNotBlank()) {
-            performSearch(currentQuery)
+            performSearch(currentQuery, logLatency = false, onRendered = onRendered)
         } else {
-            loadFirstPage()
+            loadFirstPage(onRendered)
         }
     }
 
     // ── Browse pagination ──────────────────────────────────────────────────
 
-    private fun loadFirstPage() {
+    private fun loadFirstPage(onRendered: (() -> Unit)? = null) {
         currentOffset = 0L
         isLastPage = false
         isLoadingMore = false
@@ -277,7 +318,12 @@ class MainActivity : AppCompatActivity() {
             showLoading(false)
             isLastPage = page.size < PAGE_SIZE
             currentOffset = page.size.toLong()
-            imageAdapter.resetItems(page)
+            imageAdapter.resetItems(page) {
+                rvImages.post {
+                    markInitialContentRendered()
+                    onRendered?.invoke()
+                }
+            }
             updateBrowseCountUI(page.size, isFirstPage = true)
         }
     }
@@ -297,7 +343,12 @@ class MainActivity : AppCompatActivity() {
 
     // ── Search ─────────────────────────────────────────────────────────────
 
-    private fun performSearch(query: String) {
+    private fun performSearch(
+        query: String,
+        logLatency: Boolean = true,
+        latencyStartedAtMs: Long = PerformanceLogger.now(),
+        onRendered: (() -> Unit)? = null
+    ) {
         isSearchMode = true
         currentQuery = query
         searchResultsCache = emptyList()
@@ -314,7 +365,19 @@ class MainActivity : AppCompatActivity() {
             val firstPage = filteredResults.take(PAGE_SIZE.toInt())
             searchPageOffset = firstPage.size
             isLastPage = searchPageOffset >= filteredResults.size
-            imageAdapter.resetItems(firstPage)
+            imageAdapter.resetItems(firstPage) {
+                rvImages.post {
+                    if (logLatency) {
+                        PerformanceLogger.logDuration(
+                            PerformanceLogger.TAG_RESPONSE_LATENCY,
+                            "search_response",
+                            latencyStartedAtMs,
+                            "query_length=${query.length} total_results=${filteredResults.size}"
+                        )
+                    }
+                    onRendered?.invoke()
+                }
+            }
             updateSearchUI(filteredResults.size)
         }
     }
@@ -376,31 +439,83 @@ class MainActivity : AppCompatActivity() {
     private fun openImageDetail(uri: Uri) {
         val list = imageAdapter.currentList
         val position = list.indexOf(uri).coerceAtLeast(0)
+        val navigationStartedAtMs = PerformanceLogger.now()
+        internalNavigationInProgress = true
         imageDetailLauncher.launch(Intent(this, ImageDetailActivity::class.java).apply {
             putStringArrayListExtra(Constant.IMAGE_URIS, ArrayList(list.map { it.toString() }))
             putExtra(Constant.IMAGE_POSITION, position)
+            putExtra(Constant.NAVIGATION_START_TIME_MS, navigationStartedAtMs)
         })
     }
 
     // ── System ─────────────────────────────────────────────────────────────
 
     private suspend fun initServices() {
-        ObjectBoxRepository.init(this)
-        MediaContentRepository.init(this)
-        OCRService.init(this)
-        TextEmbeddingService.init(this)
-        TranslateService.init(Locale.getDefault().language)
-        TextClassifierService.init(this)
-        ObjectExtractionService.init(this, AppConfig())
-        runCatching { ImageDescriptionService.init(this) }
+        PerformanceLogger.measure(PerformanceLogger.TAG_STARTUP, "init_objectbox") {
+            ObjectBoxRepository.init(this)
+        }
+        PerformanceLogger.measure(PerformanceLogger.TAG_STARTUP, "init_media_repository") {
+            MediaContentRepository.init(this)
+        }
+        PerformanceLogger.measure(PerformanceLogger.TAG_STARTUP, "init_ocr_service") {
+            OCRService.init(this)
+        }
+        PerformanceLogger.measure(PerformanceLogger.TAG_STARTUP, "init_text_embedder") {
+            TextEmbeddingService.init(this)
+        }
+        markCriticalServicesInitialized()
+        PerformanceLogger.measure(PerformanceLogger.TAG_STARTUP, "init_translate_service") {
+            TranslateService.init(Locale.getDefault().language)
+        }
+        PerformanceLogger.measure(PerformanceLogger.TAG_STARTUP, "init_text_classifier") {
+            TextClassifierService.init(this)
+        }
+        PerformanceLogger.measure(PerformanceLogger.TAG_STARTUP, "init_object_extraction") {
+            ObjectExtractionService.init(this, AppConfig())
+        }
+        runCatching {
+            PerformanceLogger.measureSuspend(PerformanceLogger.TAG_STARTUP, "init_image_description") {
+                ImageDescriptionService.init(this)
+            }
+        }
             .onFailure { e ->
                 Log.w(TAG, "ImageDescriptionService init thất bại trên thiết bị này: ${e.message}", e)
             }
         val speechLocale = Locale.forLanguageTag(AppConfig().userLanguage)
-        runCatching { SpeechRecognitionService.init(speechLocale) }
+        runCatching {
+            PerformanceLogger.measure(PerformanceLogger.TAG_STARTUP, "init_speech_recognition") {
+                SpeechRecognitionService.init(speechLocale)
+            }
+        }
             .onFailure { e ->
                 Log.w(TAG, "SpeechRecognitionService init thất bại trên thiết bị này: ${e.message}", e)
             }
+    }
+
+    private fun markCriticalServicesInitialized() {
+        criticalServicesInitialized = true
+        maybeLogStartupComplete()
+    }
+
+    private fun markInitialContentRendered() {
+        startupContentRendered = true
+        maybeLogStartupComplete()
+    }
+
+    private fun maybeLogStartupComplete() {
+        if (!shouldMeasureStartup || startupLogged || !criticalServicesInitialized || !startupContentRendered) {
+            return
+        }
+
+        startupLogged = true
+        window.decorView.post {
+            PerformanceLogger.logDuration(
+                PerformanceLogger.TAG_STARTUP,
+                "app_open_response",
+                appOpenStartedAtMs,
+                "condition=activity_create critical_init=objectbox_text_embedder initial_screen=rendered"
+            )
+        }
     }
 
     private fun hideKeyboard() {
@@ -508,6 +623,7 @@ class MainActivity : AppCompatActivity() {
             putExtra(Constant.COLLECTION_ID, collection.id)
             putExtra(Constant.COLLECTION_NAME, collection.name)
         }
+        internalNavigationInProgress = true
         imageDetailLauncher.launch(intent)
     }
 

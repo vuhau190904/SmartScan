@@ -50,6 +50,7 @@ import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionD
 import thesis.android.smart_scan.service.mlkit.speech_to_text.SpeechRecognitionUiHelper
 import thesis.android.smart_scan.util.Constant
 import thesis.android.smart_scan.util.EntityActionHelper
+import thesis.android.smart_scan.util.PerformanceLogger
 import thesis.android.smart_scan.util.inflateDialogTextInput
 import android.text.method.LinkMovementMethod
 import android.util.Log
@@ -99,6 +100,8 @@ class ImageDetailActivity : AppCompatActivity() {
     private var currentPosition: Int = 0
     private var isVoiceTypingNote = false
     private var isMetadataLoading = false
+    private var detailOpenLogged = false
+    private var detailNavigationStartedAtMs = 0L
 
     private lateinit var speechRecognitionDelegate: SpeechRecognitionDelegate
 
@@ -111,6 +114,10 @@ class ImageDetailActivity : AppCompatActivity() {
         val uris = resolveUris() ?: run { finish(); return }
         val startPosition = intent.getIntExtra(Constant.IMAGE_POSITION, 0)
             .coerceIn(0, uris.lastIndex)
+        detailNavigationStartedAtMs = intent.getLongExtra(
+            Constant.NAVIGATION_START_TIME_MS,
+            PerformanceLogger.now()
+        )
 
         preloadAround(uris, startPosition)
 
@@ -204,7 +211,13 @@ class ImageDetailActivity : AppCompatActivity() {
 
     private fun setupViewPager(uris: List<Uri>, startPosition: Int) {
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
-        viewPager.adapter = DetailImagePagerAdapter(uris)
+        viewPager.adapter = DetailImagePagerAdapter(
+            uris = uris,
+            firstMeasuredUri = uris[startPosition],
+            onFirstImageReady = {
+                logDetailOpenLatency(uris[startPosition])
+            }
+        )
         viewPager.offscreenPageLimit = 2
         viewPager.setCurrentItem(startPosition, false)
 
@@ -292,9 +305,10 @@ class ImageDetailActivity : AppCompatActivity() {
                 if (isUpward && bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                     val uris = resolveUris() ?: return false
                     if (currentPosition !in uris.indices) return false
+                    val metadataStartedAtMs = PerformanceLogger.now()
                     // Load data first, expand bottom sheet only after loading completes
                     showMetadataLoading()
-                    updateMetadataForPosition(uris[currentPosition])
+                    updateMetadataForPosition(uris[currentPosition], metadataStartedAtMs)
                     return true
                 }
                 return false
@@ -358,12 +372,33 @@ class ImageDetailActivity : AppCompatActivity() {
         renderScheduledReminders()
     }
 
-    private fun updateMetadataForPosition(uri: Uri) {
+    private fun updateMetadataForPosition(uri: Uri, metadataStartedAtMs: Long = PerformanceLogger.now()) {
         showMetadataLoading()
         updateMetadata(uri)
         // Expand bottom sheet after data is loaded
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         hideMetadataLoading()
+        bottomSheetContent.post {
+            PerformanceLogger.logDuration(
+                PerformanceLogger.TAG_RESPONSE_LATENCY,
+                "detail_metadata_open",
+                metadataStartedAtMs,
+                "uri=$uri"
+            )
+        }
+    }
+
+    private fun logDetailOpenLatency(uri: Uri) {
+        if (detailOpenLogged) return
+        detailOpenLogged = true
+        window.decorView.post {
+            PerformanceLogger.logDuration(
+                PerformanceLogger.TAG_RESPONSE_LATENCY,
+                "open_image_detail",
+                detailNavigationStartedAtMs,
+                "uri=$uri position=$currentPosition"
+            )
+        }
     }
 
     private fun showMetadataLoading() {

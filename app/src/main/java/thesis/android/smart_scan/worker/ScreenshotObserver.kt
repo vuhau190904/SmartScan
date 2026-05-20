@@ -14,6 +14,7 @@ import androidx.work.workDataOf
 import com.google.common.cache.CacheBuilder
 import com.google.common.cache.CacheLoader
 import thesis.android.smart_scan.util.Constant
+import thesis.android.smart_scan.util.PerformanceLogger
 import java.util.concurrent.TimeUnit
 
 class ScreenshotObserver(private val context: Context) : ContentObserver(handler) {
@@ -64,13 +65,21 @@ class ScreenshotObserver(private val context: Context) : ContentObserver(handler
     }
 
     private fun scheduleScanWorker(uri: Uri) {
-        val data = workDataOf(Constant.IMAGE_URI to uri.toString())
+        val processingStartedAtMs = PerformanceLogger.now()
+        val data = workDataOf(
+            Constant.IMAGE_URI to uri.toString(),
+            Constant.PROCESSING_START_TIME_MS to processingStartedAtMs
+        )
 
         val scanRequest = OneTimeWorkRequestBuilder<BackgroundProcessingWorker>()
             .setInputData(data)
             .build()
 
         WorkManager.getInstance(context).enqueue(scanRequest)
+        Log.i(
+            PerformanceLogger.TAG_PROCESSING_TIME,
+            "schedule_scan_worker start_ms=$processingStartedAtMs uri=$uri"
+        )
         Log.d(TAG, "Đã gửi yêu cầu xử lý ảnh $uri sang BackgroundProcessingWorker")
     }
 }

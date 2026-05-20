@@ -1,0 +1,446 @@
+--------- beginning of main
+05-20 11:41:44.694 I/StartupTime(25726): process_start start_ms=1779252104693
+05-20 11:41:45.236 I/StartupTime(25726): init_objectbox duration_ms=117 start_ms=1779252105119 end_ms=1779252105236
+05-20 11:41:45.237 I/StartupTime(25726): init_media_repository duration_ms=1 start_ms=1779252105236 end_ms=1779252105237
+05-20 11:41:45.238 I/StartupTime(25726): init_ocr_service duration_ms=1 start_ms=1779252105237 end_ms=1779252105238
+05-20 11:41:45.410 I/StartupTime(25726): init_text_embedder duration_ms=172 start_ms=1779252105238 end_ms=1779252105410
+05-20 11:41:45.422 I/StartupTime(25726): init_translate_service duration_ms=12 start_ms=1779252105410 end_ms=1779252105422
+05-20 11:41:45.439 I/StartupTime(25726): init_text_classifier duration_ms=17 start_ms=1779252105422 end_ms=1779252105439
+05-20 11:41:45.480 I/StartupTime(25726): init_object_extraction duration_ms=41 start_ms=1779252105439 end_ms=1779252105480
+05-20 11:41:45.523 I/StartupTime(25726): init_image_description duration_ms=42 start_ms=1779252105481 end_ms=1779252105523
+05-20 11:41:45.526 I/StartupTime(25726): init_speech_recognition duration_ms=2 start_ms=1779252105524 end_ms=1779252105526
+05-20 11:41:46.431 I/StartupTime(25726): app_open_response duration_ms=1608 start_ms=1779252104823 end_ms=1779252106431 condition=activity_create critical_init=objectbox_text_embedder initial_screen=rendered
+05-20 11:41:53.188 I/StartupTime(25726): app_open_response duration_ms=117 start_ms=1779252113071 end_ms=1779252113188 condition=foreground_reopen initial_screen=rendered
+05-20 11:43:23.810 I/StartupTime(25726): app_open_response duration_ms=112 start_ms=1779252203698 end_ms=1779252203810 condition=foreground_reopen initial_screen=rendered
+05-20 11:43:26.189 I/StartupTime(25726): app_open_response duration_ms=113 start_ms=1779252206076 end_ms=1779252206189 condition=foreground_reopen initial_screen=rendered
+05-20 11:43:27.952 I/StartupTime(25726): app_open_response duration_ms=125 start_ms=1779252207827 end_ms=1779252207952 condition=foreground_reopen initial_screen=rendered
+05-20 11:43:29.901 I/StartupTime(25726): app_open_response duration_ms=108 start_ms=1779252209793 end_ms=1779252209901 condition=foreground_reopen initial_screen=rendered
+05-20 11:43:31.668 I/StartupTime(25726): app_open_response duration_ms=117 start_ms=1779252211551 end_ms=1779252211668 condition=foreground_reopen initial_screen=rendered
+05-20 11:43:33.424 I/StartupTime(25726): app_open_response duration_ms=116 start_ms=1779252213308 end_ms=1779252213424 condition=foreground_reopen initial_screen=rendered
+05-20 11:43:35.247 I/StartupTime(25726): app_open_response duration_ms=124 start_ms=1779252215122 end_ms=1779252215246 condition=foreground_reopen initial_screen=rendered
+05-20 11:43:36.958 I/StartupTime(25726): app_open_response duration_ms=111 start_ms=1779252216846 end_ms=1779252216957 condition=foreground_reopen initial_screen=rendered
+05-20 11:43:38.963 I/ResponseLatency(25726): open_image_detail duration_ms=521 start_ms=1779252218442 end_ms=1779252218963 uri=content://media/external/images/media/1000515037 position=0
+05-20 11:43:39.707 I/ResponseLatency(25726): detail_metadata_open duration_ms=138 start_ms=1779252219568 end_ms=1779252219706 uri=content://media/external/images/media/1000515037
+05-20 11:43:42.986 I/ResponseLatency(25726): open_image_detail duration_ms=358 start_ms=1779252222627 end_ms=1779252222985 uri=content://media/external/images/media/1000515036 position=1
+05-20 11:43:43.611 I/ResponseLatency(25726): detail_metadata_open duration_ms=110 start_ms=1779252223501 end_ms=1779252223611 uri=content://media/external/images/media/1000515036
+05-20 11:43:47.077 I/ResponseLatency(25726): open_image_detail duration_ms=382 start_ms=1779252226695 end_ms=1779252227077 uri=content://media/external/images/media/1000515035 position=2
+05-20 11:43:47.780 I/ResponseLatency(25726): detail_metadata_open duration_ms=110 start_ms=1779252227670 end_ms=1779252227780 uri=content://media/external/images/media/1000515035
+05-20 11:43:50.589 I/ResponseLatency(25726): open_image_detail duration_ms=382 start_ms=1779252230207 end_ms=1779252230589 uri=content://media/external/images/media/1000515034 position=3
+05-20 11:43:51.249 I/ResponseLatency(25726): detail_metadata_open duration_ms=111 start_ms=1779252231138 end_ms=1779252231249 uri=content://media/external/images/media/1000515034
+05-20 11:43:53.669 I/ResponseLatency(25726): open_image_detail duration_ms=338 start_ms=1779252233331 end_ms=1779252233669 uri=content://media/external/images/media/1000515033 position=4
+05-20 11:43:54.276 I/ResponseLatency(25726): detail_metadata_open duration_ms=107 start_ms=1779252234169 end_ms=1779252234276 uri=content://media/external/images/media/1000515033
+05-20 11:43:56.870 I/ResponseLatency(25726): open_image_detail duration_ms=350 start_ms=1779252236520 end_ms=1779252236870 uri=content://media/external/images/media/1000515032 position=5
+05-20 11:43:57.587 I/ResponseLatency(25726): detail_metadata_open duration_ms=171 start_ms=1779252237416 end_ms=1779252237587 uri=content://media/external/images/media/1000515032
+05-20 11:44:00.908 I/ResponseLatency(25726): open_image_detail duration_ms=370 start_ms=1779252240538 end_ms=1779252240908 uri=content://media/external/images/media/1000515031 position=6
+05-20 11:44:01.568 I/ResponseLatency(25726): detail_metadata_open duration_ms=226 start_ms=1779252241342 end_ms=1779252241568 uri=content://media/external/images/media/1000515031
+05-20 11:44:05.325 I/ResponseLatency(25726): open_image_detail duration_ms=347 start_ms=1779252244978 end_ms=1779252245325 uri=content://media/external/images/media/1000515030 position=7
+05-20 11:44:05.936 I/ResponseLatency(25726): detail_metadata_open duration_ms=154 start_ms=1779252245782 end_ms=1779252245936 uri=content://media/external/images/media/1000515030
+05-20 11:44:11.721 I/ResponseLatency(25726): open_image_detail duration_ms=346 start_ms=1779252251375 end_ms=1779252251721 uri=content://media/external/images/media/1000515026 position=11
+05-20 11:44:12.397 I/ResponseLatency(25726): detail_metadata_open duration_ms=132 start_ms=1779252252265 end_ms=1779252252397 uri=content://media/external/images/media/1000515026
+05-20 11:44:16.212 I/ResponseLatency(25726): open_image_detail duration_ms=345 start_ms=1779252255867 end_ms=1779252256212 uri=content://media/external/images/media/1000515025 position=12
+05-20 11:44:16.940 I/ResponseLatency(25726): detail_metadata_open duration_ms=126 start_ms=1779252256814 end_ms=1779252256940 uri=content://media/external/images/media/1000515025
+05-20 11:44:31.170 I/ResponseLatency(25726): open_image_detail duration_ms=347 start_ms=1779252270823 end_ms=1779252271170 uri=content://media/external/images/media/1000515030 position=7
+05-20 11:44:37.790 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252277775 uri=content://media/external/images/media/1000515038
+05-20 11:44:37.978 I/ProcessingTime(25726): step_media_store_read duration_ms=20 start_ms=1779252277958 end_ms=1779252277978 uri=content://media/external/images/media/1000515038
+05-20 11:44:38.048 I/ProcessingTime(25726): step_image_description duration_ms=65 start_ms=1779252277983 end_ms=1779252278048 uri=content://media/external/images/media/1000515038
+05-20 11:44:38.297 I/ProcessingTime(25726): step_image_labeling duration_ms=249 start_ms=1779252278048 end_ms=1779252278297 uri=content://media/external/images/media/1000515038
+05-20 11:44:38.453 I/ProcessingTime(25726): step_embed_description_text duration_ms=155 start_ms=1779252278298 end_ms=1779252278453 uri=content://media/external/images/media/1000515038 text_length=42
+05-20 11:44:38.454 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=471 start_ms=1779252277983 end_ms=1779252278454 uri=content://media/external/images/media/1000515038
+05-20 11:44:38.768 I/ProcessingTime(25726): step_ocr duration_ms=785 start_ms=1779252277983 end_ms=1779252278768 uri=content://media/external/images/media/1000515038
+05-20 11:44:38.797 I/ProcessingTime(25726): step_text_classifier duration_ms=28 start_ms=1779252278768 end_ms=1779252278796 uri=content://media/external/images/media/1000515038 text_length=249
+05-20 11:44:38.848 I/ProcessingTime(25726): step_language_identification duration_ms=50 start_ms=1779252278798 end_ms=1779252278848 uri=content://media/external/images/media/1000515038 text_length=249
+05-20 11:44:40.924 I/ProcessingTime(25726): step_translate_to_en duration_ms=2076 start_ms=1779252278848 end_ms=1779252280924 uri=content://media/external/images/media/1000515038 source_language=vi text_length=249
+05-20 11:44:41.030 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=106 start_ms=1779252280924 end_ms=1779252281030 uri=content://media/external/images/media/1000515038 text_length=246
+05-20 11:44:41.030 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=3048 start_ms=1779252277982 end_ms=1779252281030 uri=content://media/external/images/media/1000515038
+05-20 11:44:41.078 I/ProcessingTime(25726): step_objectbox_put duration_ms=47 start_ms=1779252281031 end_ms=1779252281078 uri=content://media/external/images/media/1000515038
+05-20 11:44:41.104 I/ProcessingTime(25726): step_assign_collections duration_ms=26 start_ms=1779252281078 end_ms=1779252281104 uri=content://media/external/images/media/1000515038 labels=3
+05-20 11:44:41.104 I/ProcessingTime(25726): image_processor_total duration_ms=3147 start_ms=1779252277957 end_ms=1779252281104 uri=content://media/external/images/media/1000515038 mode=parallel
+05-20 11:44:41.104 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=3329 start_ms=1779252277775 end_ms=1779252281104 uri=content://media/external/images/media/1000515038 mode=parallel
+05-20 11:44:41.106 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=3331 start_ms=1779252277775 end_ms=1779252281106 uri=content://media/external/images/media/1000515038
+05-20 11:44:46.741 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252286738 uri=content://media/external/images/media/1000515039
+05-20 11:44:46.856 I/ProcessingTime(25726): step_media_store_read duration_ms=13 start_ms=1779252286843 end_ms=1779252286856 uri=content://media/external/images/media/1000515039
+05-20 11:44:46.903 I/ProcessingTime(25726): step_image_description duration_ms=45 start_ms=1779252286858 end_ms=1779252286903 uri=content://media/external/images/media/1000515039
+05-20 11:44:47.053 I/ProcessingTime(25726): step_image_labeling duration_ms=149 start_ms=1779252286903 end_ms=1779252287052 uri=content://media/external/images/media/1000515039
+05-20 11:44:47.158 I/ProcessingTime(25726): step_embed_description_text duration_ms=105 start_ms=1779252287053 end_ms=1779252287158 uri=content://media/external/images/media/1000515039 text_length=42
+05-20 11:44:47.159 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=301 start_ms=1779252286858 end_ms=1779252287159 uri=content://media/external/images/media/1000515039
+05-20 11:44:47.298 I/ProcessingTime(25726): step_ocr duration_ms=440 start_ms=1779252286857 end_ms=1779252287297 uri=content://media/external/images/media/1000515039
+05-20 11:44:47.323 I/ProcessingTime(25726): step_text_classifier duration_ms=25 start_ms=1779252287298 end_ms=1779252287323 uri=content://media/external/images/media/1000515039 text_length=249
+05-20 11:44:47.329 I/ProcessingTime(25726): step_language_identification duration_ms=5 start_ms=1779252287324 end_ms=1779252287329 uri=content://media/external/images/media/1000515039 text_length=249
+05-20 11:44:48.215 I/ProcessingTime(25726): step_translate_to_en duration_ms=886 start_ms=1779252287329 end_ms=1779252288215 uri=content://media/external/images/media/1000515039 source_language=vi text_length=249
+05-20 11:44:48.318 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=103 start_ms=1779252288215 end_ms=1779252288318 uri=content://media/external/images/media/1000515039 text_length=246
+05-20 11:44:48.318 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1461 start_ms=1779252286857 end_ms=1779252288318 uri=content://media/external/images/media/1000515039
+05-20 11:44:48.328 I/ProcessingTime(25726): step_objectbox_put duration_ms=6 start_ms=1779252288321 end_ms=1779252288327 uri=content://media/external/images/media/1000515039
+05-20 11:44:48.360 I/ProcessingTime(25726): step_assign_collections duration_ms=32 start_ms=1779252288328 end_ms=1779252288360 uri=content://media/external/images/media/1000515039 labels=3
+05-20 11:44:48.360 I/ProcessingTime(25726): image_processor_total duration_ms=1518 start_ms=1779252286842 end_ms=1779252288360 uri=content://media/external/images/media/1000515039 mode=parallel
+05-20 11:44:48.360 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1622 start_ms=1779252286738 end_ms=1779252288360 uri=content://media/external/images/media/1000515039 mode=parallel
+05-20 11:44:48.361 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1623 start_ms=1779252286738 end_ms=1779252288361 uri=content://media/external/images/media/1000515039
+05-20 11:44:52.702 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252292700 uri=content://media/external/images/media/1000515040
+05-20 11:44:52.863 I/ProcessingTime(25726): step_media_store_read duration_ms=19 start_ms=1779252292844 end_ms=1779252292863 uri=content://media/external/images/media/1000515040
+05-20 11:44:52.910 I/ProcessingTime(25726): step_image_description duration_ms=43 start_ms=1779252292866 end_ms=1779252292909 uri=content://media/external/images/media/1000515040
+05-20 11:44:53.063 I/ProcessingTime(25726): step_image_labeling duration_ms=153 start_ms=1779252292910 end_ms=1779252293063 uri=content://media/external/images/media/1000515040
+05-20 11:44:53.178 I/ProcessingTime(25726): step_embed_description_text duration_ms=114 start_ms=1779252293064 end_ms=1779252293178 uri=content://media/external/images/media/1000515040 text_length=42
+05-20 11:44:53.178 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=312 start_ms=1779252292866 end_ms=1779252293178 uri=content://media/external/images/media/1000515040
+05-20 11:44:53.331 I/ProcessingTime(25726): step_ocr duration_ms=466 start_ms=1779252292865 end_ms=1779252293331 uri=content://media/external/images/media/1000515040
+05-20 11:44:53.358 I/ProcessingTime(25726): step_text_classifier duration_ms=27 start_ms=1779252293331 end_ms=1779252293358 uri=content://media/external/images/media/1000515040 text_length=249
+05-20 11:44:53.361 I/ProcessingTime(25726): step_language_identification duration_ms=2 start_ms=1779252293359 end_ms=1779252293361 uri=content://media/external/images/media/1000515040 text_length=249
+05-20 11:44:54.176 I/ProcessingTime(25726): step_translate_to_en duration_ms=815 start_ms=1779252293361 end_ms=1779252294176 uri=content://media/external/images/media/1000515040 source_language=vi text_length=249
+05-20 11:44:54.275 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=98 start_ms=1779252294177 end_ms=1779252294275 uri=content://media/external/images/media/1000515040 text_length=246
+05-20 11:44:54.275 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1410 start_ms=1779252292865 end_ms=1779252294275 uri=content://media/external/images/media/1000515040
+05-20 11:44:54.279 I/ProcessingTime(25726): step_objectbox_put duration_ms=3 start_ms=1779252294276 end_ms=1779252294279 uri=content://media/external/images/media/1000515040
+05-20 11:44:54.300 I/ProcessingTime(25726): step_assign_collections duration_ms=21 start_ms=1779252294279 end_ms=1779252294300 uri=content://media/external/images/media/1000515040 labels=3
+05-20 11:44:54.300 I/ProcessingTime(25726): image_processor_total duration_ms=1456 start_ms=1779252292844 end_ms=1779252294300 uri=content://media/external/images/media/1000515040 mode=parallel
+05-20 11:44:54.300 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1600 start_ms=1779252292700 end_ms=1779252294300 uri=content://media/external/images/media/1000515040 mode=parallel
+05-20 11:44:54.301 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1600 start_ms=1779252292700 end_ms=1779252294300 uri=content://media/external/images/media/1000515040
+05-20 11:44:58.980 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252298978 uri=content://media/external/images/media/1000515041
+05-20 11:44:59.086 I/ProcessingTime(25726): step_media_store_read duration_ms=14 start_ms=1779252299071 end_ms=1779252299085 uri=content://media/external/images/media/1000515041
+05-20 11:44:59.130 I/ProcessingTime(25726): step_image_description duration_ms=42 start_ms=1779252299088 end_ms=1779252299130 uri=content://media/external/images/media/1000515041
+05-20 11:44:59.273 I/ProcessingTime(25726): step_image_labeling duration_ms=142 start_ms=1779252299131 end_ms=1779252299273 uri=content://media/external/images/media/1000515041
+05-20 11:44:59.401 I/ProcessingTime(25726): step_embed_description_text duration_ms=127 start_ms=1779252299274 end_ms=1779252299401 uri=content://media/external/images/media/1000515041 text_length=42
+05-20 11:44:59.401 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=313 start_ms=1779252299088 end_ms=1779252299401 uri=content://media/external/images/media/1000515041
+05-20 11:44:59.514 I/ProcessingTime(25726): step_ocr duration_ms=427 start_ms=1779252299087 end_ms=1779252299514 uri=content://media/external/images/media/1000515041
+05-20 11:44:59.540 I/ProcessingTime(25726): step_text_classifier duration_ms=25 start_ms=1779252299514 end_ms=1779252299539 uri=content://media/external/images/media/1000515041 text_length=249
+05-20 11:44:59.543 I/ProcessingTime(25726): step_language_identification duration_ms=3 start_ms=1779252299540 end_ms=1779252299543 uri=content://media/external/images/media/1000515041 text_length=249
+05-20 11:45:00.366 I/ProcessingTime(25726): step_translate_to_en duration_ms=822 start_ms=1779252299544 end_ms=1779252300366 uri=content://media/external/images/media/1000515041 source_language=vi text_length=249
+05-20 11:45:00.468 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=101 start_ms=1779252300367 end_ms=1779252300468 uri=content://media/external/images/media/1000515041 text_length=246
+05-20 11:45:00.469 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1382 start_ms=1779252299087 end_ms=1779252300469 uri=content://media/external/images/media/1000515041
+05-20 11:45:00.480 I/ProcessingTime(25726): step_objectbox_put duration_ms=6 start_ms=1779252300473 end_ms=1779252300479 uri=content://media/external/images/media/1000515041
+05-20 11:45:00.520 I/ProcessingTime(25726): step_assign_collections duration_ms=40 start_ms=1779252300480 end_ms=1779252300520 uri=content://media/external/images/media/1000515041 labels=3
+05-20 11:45:00.520 I/ProcessingTime(25726): image_processor_total duration_ms=1449 start_ms=1779252299071 end_ms=1779252300520 uri=content://media/external/images/media/1000515041 mode=parallel
+05-20 11:45:00.520 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1542 start_ms=1779252298978 end_ms=1779252300520 uri=content://media/external/images/media/1000515041 mode=parallel
+05-20 11:45:00.521 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1543 start_ms=1779252298978 end_ms=1779252300521 uri=content://media/external/images/media/1000515041
+05-20 11:45:06.050 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252306049 uri=content://media/external/images/media/1000515042
+05-20 11:45:06.238 I/ProcessingTime(25726): step_media_store_read duration_ms=20 start_ms=1779252306217 end_ms=1779252306237 uri=content://media/external/images/media/1000515042
+05-20 11:45:06.286 I/ProcessingTime(25726): step_image_description duration_ms=46 start_ms=1779252306240 end_ms=1779252306286 uri=content://media/external/images/media/1000515042
+05-20 11:45:06.436 I/ProcessingTime(25726): step_image_labeling duration_ms=148 start_ms=1779252306287 end_ms=1779252306435 uri=content://media/external/images/media/1000515042
+05-20 11:45:06.560 I/ProcessingTime(25726): step_embed_description_text duration_ms=122 start_ms=1779252306437 end_ms=1779252306559 uri=content://media/external/images/media/1000515042 text_length=42
+05-20 11:45:06.560 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=320 start_ms=1779252306240 end_ms=1779252306560 uri=content://media/external/images/media/1000515042
+05-20 11:45:06.655 I/ProcessingTime(25726): step_ocr duration_ms=416 start_ms=1779252306239 end_ms=1779252306655 uri=content://media/external/images/media/1000515042
+05-20 11:45:06.679 I/ProcessingTime(25726): step_text_classifier duration_ms=24 start_ms=1779252306655 end_ms=1779252306679 uri=content://media/external/images/media/1000515042 text_length=249
+05-20 11:45:06.683 I/ProcessingTime(25726): step_language_identification duration_ms=4 start_ms=1779252306679 end_ms=1779252306683 uri=content://media/external/images/media/1000515042 text_length=249
+05-20 11:45:07.435 I/ProcessingTime(25726): step_translate_to_en duration_ms=752 start_ms=1779252306683 end_ms=1779252307435 uri=content://media/external/images/media/1000515042 source_language=vi text_length=249
+05-20 11:45:07.535 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=100 start_ms=1779252307435 end_ms=1779252307535 uri=content://media/external/images/media/1000515042 text_length=246
+05-20 11:45:07.536 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1296 start_ms=1779252306239 end_ms=1779252307535 uri=content://media/external/images/media/1000515042
+05-20 11:45:07.545 I/ProcessingTime(25726): step_objectbox_put duration_ms=7 start_ms=1779252307538 end_ms=1779252307545 uri=content://media/external/images/media/1000515042
+05-20 11:45:07.580 I/ProcessingTime(25726): step_assign_collections duration_ms=33 start_ms=1779252307546 end_ms=1779252307579 uri=content://media/external/images/media/1000515042 labels=3
+05-20 11:45:07.580 I/ProcessingTime(25726): image_processor_total duration_ms=1363 start_ms=1779252306217 end_ms=1779252307580 uri=content://media/external/images/media/1000515042 mode=parallel
+05-20 11:45:07.580 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1531 start_ms=1779252306049 end_ms=1779252307580 uri=content://media/external/images/media/1000515042 mode=parallel
+05-20 11:45:07.581 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1532 start_ms=1779252306049 end_ms=1779252307581 uri=content://media/external/images/media/1000515042
+05-20 11:45:10.090 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252310088 uri=content://media/external/images/media/1000515043
+05-20 11:45:10.203 I/ProcessingTime(25726): step_media_store_read duration_ms=10 start_ms=1779252310193 end_ms=1779252310203 uri=content://media/external/images/media/1000515043
+05-20 11:45:10.241 I/ProcessingTime(25726): step_image_description duration_ms=36 start_ms=1779252310205 end_ms=1779252310241 uri=content://media/external/images/media/1000515043
+05-20 11:45:10.389 I/ProcessingTime(25726): step_image_labeling duration_ms=148 start_ms=1779252310241 end_ms=1779252310389 uri=content://media/external/images/media/1000515043
+05-20 11:45:10.492 I/ProcessingTime(25726): step_embed_description_text duration_ms=102 start_ms=1779252310389 end_ms=1779252310491 uri=content://media/external/images/media/1000515043 text_length=42
+05-20 11:45:10.492 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=287 start_ms=1779252310205 end_ms=1779252310492 uri=content://media/external/images/media/1000515043
+05-20 11:45:10.579 I/ProcessingTime(25726): step_ocr duration_ms=375 start_ms=1779252310204 end_ms=1779252310579 uri=content://media/external/images/media/1000515043
+05-20 11:45:10.604 I/ProcessingTime(25726): step_text_classifier duration_ms=24 start_ms=1779252310580 end_ms=1779252310604 uri=content://media/external/images/media/1000515043 text_length=249
+05-20 11:45:10.607 I/ProcessingTime(25726): step_language_identification duration_ms=3 start_ms=1779252310604 end_ms=1779252310607 uri=content://media/external/images/media/1000515043 text_length=249
+05-20 11:45:11.372 I/ProcessingTime(25726): step_translate_to_en duration_ms=764 start_ms=1779252310607 end_ms=1779252311371 uri=content://media/external/images/media/1000515043 source_language=vi text_length=249
+05-20 11:45:11.472 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=99 start_ms=1779252311372 end_ms=1779252311471 uri=content://media/external/images/media/1000515043 text_length=246
+05-20 11:45:11.472 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1268 start_ms=1779252310204 end_ms=1779252311472 uri=content://media/external/images/media/1000515043
+05-20 11:45:11.480 I/ProcessingTime(25726): step_objectbox_put duration_ms=6 start_ms=1779252311473 end_ms=1779252311479 uri=content://media/external/images/media/1000515043
+05-20 11:45:11.516 I/ProcessingTime(25726): step_assign_collections duration_ms=36 start_ms=1779252311480 end_ms=1779252311516 uri=content://media/external/images/media/1000515043 labels=3
+05-20 11:45:11.516 I/ProcessingTime(25726): image_processor_total duration_ms=1323 start_ms=1779252310193 end_ms=1779252311516 uri=content://media/external/images/media/1000515043 mode=parallel
+05-20 11:45:11.517 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1429 start_ms=1779252310088 end_ms=1779252311517 uri=content://media/external/images/media/1000515043 mode=parallel
+05-20 11:45:11.517 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1429 start_ms=1779252310088 end_ms=1779252311517 uri=content://media/external/images/media/1000515043
+05-20 11:45:13.846 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252313844 uri=content://media/external/images/media/1000515044
+05-20 11:45:14.047 I/ProcessingTime(25726): step_media_store_read duration_ms=21 start_ms=1779252314026 end_ms=1779252314047 uri=content://media/external/images/media/1000515044
+05-20 11:45:14.089 I/ProcessingTime(25726): step_image_description duration_ms=40 start_ms=1779252314049 end_ms=1779252314089 uri=content://media/external/images/media/1000515044
+05-20 11:45:14.237 I/ProcessingTime(25726): step_image_labeling duration_ms=148 start_ms=1779252314089 end_ms=1779252314237 uri=content://media/external/images/media/1000515044
+05-20 11:45:14.346 I/ProcessingTime(25726): step_embed_description_text duration_ms=108 start_ms=1779252314237 end_ms=1779252314345 uri=content://media/external/images/media/1000515044 text_length=42
+05-20 11:45:14.346 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=297 start_ms=1779252314049 end_ms=1779252314346 uri=content://media/external/images/media/1000515044
+05-20 11:45:14.452 I/ProcessingTime(25726): step_ocr duration_ms=403 start_ms=1779252314049 end_ms=1779252314452 uri=content://media/external/images/media/1000515044
+05-20 11:45:14.478 I/ProcessingTime(25726): step_text_classifier duration_ms=25 start_ms=1779252314453 end_ms=1779252314478 uri=content://media/external/images/media/1000515044 text_length=249
+05-20 11:45:14.481 I/ProcessingTime(25726): step_language_identification duration_ms=3 start_ms=1779252314478 end_ms=1779252314481 uri=content://media/external/images/media/1000515044 text_length=249
+05-20 11:45:15.240 I/ProcessingTime(25726): step_translate_to_en duration_ms=759 start_ms=1779252314481 end_ms=1779252315240 uri=content://media/external/images/media/1000515044 source_language=vi text_length=249
+05-20 11:45:15.343 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=103 start_ms=1779252315240 end_ms=1779252315343 uri=content://media/external/images/media/1000515044 text_length=246
+05-20 11:45:15.344 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1295 start_ms=1779252314049 end_ms=1779252315344 uri=content://media/external/images/media/1000515044
+05-20 11:45:15.354 I/ProcessingTime(25726): step_objectbox_put duration_ms=7 start_ms=1779252315347 end_ms=1779252315354 uri=content://media/external/images/media/1000515044
+05-20 11:45:15.388 I/ProcessingTime(25726): step_assign_collections duration_ms=34 start_ms=1779252315354 end_ms=1779252315388 uri=content://media/external/images/media/1000515044 labels=3
+05-20 11:45:15.388 I/ProcessingTime(25726): image_processor_total duration_ms=1362 start_ms=1779252314026 end_ms=1779252315388 uri=content://media/external/images/media/1000515044 mode=parallel
+05-20 11:45:15.388 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1544 start_ms=1779252313844 end_ms=1779252315388 uri=content://media/external/images/media/1000515044 mode=parallel
+05-20 11:45:15.389 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1545 start_ms=1779252313844 end_ms=1779252315389 uri=content://media/external/images/media/1000515044
+05-20 11:45:17.549 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252317547 uri=content://media/external/images/media/1000515045
+05-20 11:45:17.654 I/ProcessingTime(25726): step_media_store_read duration_ms=15 start_ms=1779252317639 end_ms=1779252317654 uri=content://media/external/images/media/1000515045
+05-20 11:45:17.694 I/ProcessingTime(25726): step_image_description duration_ms=38 start_ms=1779252317656 end_ms=1779252317694 uri=content://media/external/images/media/1000515045
+05-20 11:45:17.833 I/ProcessingTime(25726): step_image_labeling duration_ms=139 start_ms=1779252317694 end_ms=1779252317833 uri=content://media/external/images/media/1000515045
+05-20 11:45:17.937 I/ProcessingTime(25726): step_embed_description_text duration_ms=103 start_ms=1779252317834 end_ms=1779252317937 uri=content://media/external/images/media/1000515045 text_length=42
+05-20 11:45:17.937 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=281 start_ms=1779252317656 end_ms=1779252317937 uri=content://media/external/images/media/1000515045
+05-20 11:45:18.026 I/ProcessingTime(25726): step_ocr duration_ms=371 start_ms=1779252317655 end_ms=1779252318026 uri=content://media/external/images/media/1000515045
+05-20 11:45:18.052 I/ProcessingTime(25726): step_text_classifier duration_ms=26 start_ms=1779252318026 end_ms=1779252318052 uri=content://media/external/images/media/1000515045 text_length=249
+05-20 11:45:18.057 I/ProcessingTime(25726): step_language_identification duration_ms=4 start_ms=1779252318053 end_ms=1779252318057 uri=content://media/external/images/media/1000515045 text_length=249
+05-20 11:45:18.810 I/ProcessingTime(25726): step_translate_to_en duration_ms=753 start_ms=1779252318057 end_ms=1779252318810 uri=content://media/external/images/media/1000515045 source_language=vi text_length=249
+05-20 11:45:18.948 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=138 start_ms=1779252318810 end_ms=1779252318948 uri=content://media/external/images/media/1000515045 text_length=246
+05-20 11:45:18.948 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1293 start_ms=1779252317655 end_ms=1779252318948 uri=content://media/external/images/media/1000515045
+05-20 11:45:18.957 I/ProcessingTime(25726): step_objectbox_put duration_ms=7 start_ms=1779252318950 end_ms=1779252318957 uri=content://media/external/images/media/1000515045
+05-20 11:45:19.000 I/ProcessingTime(25726): step_assign_collections duration_ms=43 start_ms=1779252318957 end_ms=1779252319000 uri=content://media/external/images/media/1000515045 labels=3
+05-20 11:45:19.000 I/ProcessingTime(25726): image_processor_total duration_ms=1361 start_ms=1779252317639 end_ms=1779252319000 uri=content://media/external/images/media/1000515045 mode=parallel
+05-20 11:45:19.001 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1454 start_ms=1779252317547 end_ms=1779252319001 uri=content://media/external/images/media/1000515045 mode=parallel
+05-20 11:45:19.002 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1455 start_ms=1779252317547 end_ms=1779252319002 uri=content://media/external/images/media/1000515045
+05-20 11:45:25.943 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252325940 uri=content://media/external/images/media/1000515046
+05-20 11:45:26.081 I/ProcessingTime(25726): step_media_store_read duration_ms=16 start_ms=1779252326065 end_ms=1779252326081 uri=content://media/external/images/media/1000515046
+05-20 11:45:26.123 I/ProcessingTime(25726): step_image_description duration_ms=40 start_ms=1779252326083 end_ms=1779252326123 uri=content://media/external/images/media/1000515046
+05-20 11:45:26.274 I/ProcessingTime(25726): step_image_labeling duration_ms=150 start_ms=1779252326124 end_ms=1779252326274 uri=content://media/external/images/media/1000515046
+05-20 11:45:26.379 I/ProcessingTime(25726): step_embed_description_text duration_ms=104 start_ms=1779252326275 end_ms=1779252326379 uri=content://media/external/images/media/1000515046 text_length=42
+05-20 11:45:26.380 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=297 start_ms=1779252326083 end_ms=1779252326380 uri=content://media/external/images/media/1000515046
+05-20 11:45:26.455 I/ProcessingTime(25726): step_ocr duration_ms=372 start_ms=1779252326083 end_ms=1779252326455 uri=content://media/external/images/media/1000515046
+05-20 11:45:26.480 I/ProcessingTime(25726): step_text_classifier duration_ms=23 start_ms=1779252326456 end_ms=1779252326479 uri=content://media/external/images/media/1000515046 text_length=249
+05-20 11:45:26.483 I/ProcessingTime(25726): step_language_identification duration_ms=3 start_ms=1779252326480 end_ms=1779252326483 uri=content://media/external/images/media/1000515046 text_length=249
+05-20 11:45:27.221 I/ProcessingTime(25726): step_translate_to_en duration_ms=738 start_ms=1779252326483 end_ms=1779252327221 uri=content://media/external/images/media/1000515046 source_language=vi text_length=249
+05-20 11:45:27.327 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=106 start_ms=1779252327221 end_ms=1779252327327 uri=content://media/external/images/media/1000515046 text_length=246
+05-20 11:45:27.327 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1245 start_ms=1779252326082 end_ms=1779252327327 uri=content://media/external/images/media/1000515046
+05-20 11:45:27.335 I/ProcessingTime(25726): step_objectbox_put duration_ms=6 start_ms=1779252327329 end_ms=1779252327335 uri=content://media/external/images/media/1000515046
+05-20 11:45:27.372 I/ProcessingTime(25726): step_assign_collections duration_ms=36 start_ms=1779252327335 end_ms=1779252327371 uri=content://media/external/images/media/1000515046 labels=3
+05-20 11:45:27.372 I/ProcessingTime(25726): image_processor_total duration_ms=1307 start_ms=1779252326065 end_ms=1779252327372 uri=content://media/external/images/media/1000515046 mode=parallel
+05-20 11:45:27.372 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1432 start_ms=1779252325940 end_ms=1779252327372 uri=content://media/external/images/media/1000515046 mode=parallel
+05-20 11:45:27.373 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1433 start_ms=1779252325940 end_ms=1779252327373 uri=content://media/external/images/media/1000515046
+05-20 11:45:40.319 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252340317 uri=content://media/external/images/media/1000515047
+05-20 11:45:40.415 I/ProcessingTime(25726): step_media_store_read duration_ms=12 start_ms=1779252340402 end_ms=1779252340414 uri=content://media/external/images/media/1000515047
+05-20 11:45:40.454 I/ProcessingTime(25726): step_image_description duration_ms=37 start_ms=1779252340417 end_ms=1779252340454 uri=content://media/external/images/media/1000515047
+05-20 11:45:40.613 I/ProcessingTime(25726): step_image_labeling duration_ms=157 start_ms=1779252340455 end_ms=1779252340612 uri=content://media/external/images/media/1000515047
+05-20 11:45:40.754 I/ProcessingTime(25726): step_embed_description_text duration_ms=140 start_ms=1779252340613 end_ms=1779252340753 uri=content://media/external/images/media/1000515047 text_length=42
+05-20 11:45:40.754 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=337 start_ms=1779252340417 end_ms=1779252340754 uri=content://media/external/images/media/1000515047
+05-20 11:45:40.867 I/ProcessingTime(25726): step_ocr duration_ms=450 start_ms=1779252340416 end_ms=1779252340866 uri=content://media/external/images/media/1000515047
+05-20 11:45:40.894 I/ProcessingTime(25726): step_text_classifier duration_ms=26 start_ms=1779252340867 end_ms=1779252340893 uri=content://media/external/images/media/1000515047 text_length=249
+05-20 11:45:40.898 I/ProcessingTime(25726): step_language_identification duration_ms=4 start_ms=1779252340894 end_ms=1779252340898 uri=content://media/external/images/media/1000515047 text_length=249
+05-20 11:45:41.646 I/ProcessingTime(25726): step_translate_to_en duration_ms=748 start_ms=1779252340898 end_ms=1779252341646 uri=content://media/external/images/media/1000515047 source_language=vi text_length=249
+05-20 11:45:41.750 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=104 start_ms=1779252341646 end_ms=1779252341750 uri=content://media/external/images/media/1000515047 text_length=246
+05-20 11:45:41.751 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1335 start_ms=1779252340416 end_ms=1779252341751 uri=content://media/external/images/media/1000515047
+05-20 11:45:41.762 I/ProcessingTime(25726): step_objectbox_put duration_ms=7 start_ms=1779252341755 end_ms=1779252341762 uri=content://media/external/images/media/1000515047
+05-20 11:45:41.804 I/ProcessingTime(25726): step_assign_collections duration_ms=42 start_ms=1779252341762 end_ms=1779252341804 uri=content://media/external/images/media/1000515047 labels=3
+05-20 11:45:41.804 I/ProcessingTime(25726): image_processor_total duration_ms=1402 start_ms=1779252340402 end_ms=1779252341804 uri=content://media/external/images/media/1000515047 mode=parallel
+05-20 11:45:41.804 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1487 start_ms=1779252340317 end_ms=1779252341804 uri=content://media/external/images/media/1000515047 mode=parallel
+05-20 11:45:41.805 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1488 start_ms=1779252340317 end_ms=1779252341805 uri=content://media/external/images/media/1000515047
+05-20 11:45:46.476 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252346475 uri=content://media/external/images/media/1000515048
+05-20 11:45:46.615 I/ProcessingTime(25726): step_media_store_read duration_ms=17 start_ms=1779252346598 end_ms=1779252346615 uri=content://media/external/images/media/1000515048
+05-20 11:45:46.665 I/ProcessingTime(25726): step_image_description duration_ms=47 start_ms=1779252346618 end_ms=1779252346665 uri=content://media/external/images/media/1000515048
+05-20 11:45:46.808 I/ProcessingTime(25726): step_image_labeling duration_ms=142 start_ms=1779252346666 end_ms=1779252346808 uri=content://media/external/images/media/1000515048
+05-20 11:45:46.909 I/ProcessingTime(25726): step_embed_description_text duration_ms=100 start_ms=1779252346809 end_ms=1779252346909 uri=content://media/external/images/media/1000515048 text_length=42
+05-20 11:45:46.909 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=291 start_ms=1779252346618 end_ms=1779252346909 uri=content://media/external/images/media/1000515048
+05-20 11:45:46.999 I/ProcessingTime(25726): step_ocr duration_ms=382 start_ms=1779252346617 end_ms=1779252346999 uri=content://media/external/images/media/1000515048
+05-20 11:45:47.027 I/ProcessingTime(25726): step_text_classifier duration_ms=27 start_ms=1779252347000 end_ms=1779252347027 uri=content://media/external/images/media/1000515048 text_length=249
+05-20 11:45:47.031 I/ProcessingTime(25726): step_language_identification duration_ms=3 start_ms=1779252347028 end_ms=1779252347031 uri=content://media/external/images/media/1000515048 text_length=249
+05-20 11:45:47.763 I/ProcessingTime(25726): step_translate_to_en duration_ms=731 start_ms=1779252347032 end_ms=1779252347763 uri=content://media/external/images/media/1000515048 source_language=vi text_length=249
+05-20 11:45:47.932 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=169 start_ms=1779252347763 end_ms=1779252347932 uri=content://media/external/images/media/1000515048 text_length=246
+05-20 11:45:47.933 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1316 start_ms=1779252346617 end_ms=1779252347933 uri=content://media/external/images/media/1000515048
+05-20 11:45:47.944 I/ProcessingTime(25726): step_objectbox_put duration_ms=6 start_ms=1779252347937 end_ms=1779252347943 uri=content://media/external/images/media/1000515048
+05-20 11:45:47.974 I/ProcessingTime(25726): step_assign_collections duration_ms=30 start_ms=1779252347944 end_ms=1779252347974 uri=content://media/external/images/media/1000515048 labels=3
+05-20 11:45:47.974 I/ProcessingTime(25726): image_processor_total duration_ms=1376 start_ms=1779252346598 end_ms=1779252347974 uri=content://media/external/images/media/1000515048 mode=parallel
+05-20 11:45:47.974 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1499 start_ms=1779252346475 end_ms=1779252347974 uri=content://media/external/images/media/1000515048 mode=parallel
+05-20 11:45:47.975 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1500 start_ms=1779252346475 end_ms=1779252347975 uri=content://media/external/images/media/1000515048
+05-20 11:46:05.425 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252365423 uri=content://media/external/images/media/1000515049
+05-20 11:46:05.531 I/ProcessingTime(25726): step_media_store_read duration_ms=17 start_ms=1779252365514 end_ms=1779252365531 uri=content://media/external/images/media/1000515049
+05-20 11:46:05.578 I/ProcessingTime(25726): step_image_description duration_ms=44 start_ms=1779252365534 end_ms=1779252365578 uri=content://media/external/images/media/1000515049
+05-20 11:46:05.726 I/ProcessingTime(25726): step_image_labeling duration_ms=148 start_ms=1779252365578 end_ms=1779252365726 uri=content://media/external/images/media/1000515049
+05-20 11:46:05.845 I/ProcessingTime(25726): step_embed_description_text duration_ms=118 start_ms=1779252365727 end_ms=1779252365845 uri=content://media/external/images/media/1000515049 text_length=42
+05-20 11:46:05.845 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=311 start_ms=1779252365534 end_ms=1779252365845 uri=content://media/external/images/media/1000515049
+05-20 11:46:05.915 I/ProcessingTime(25726): step_ocr duration_ms=381 start_ms=1779252365534 end_ms=1779252365915 uri=content://media/external/images/media/1000515049
+05-20 11:46:05.943 I/ProcessingTime(25726): step_text_classifier duration_ms=28 start_ms=1779252365915 end_ms=1779252365943 uri=content://media/external/images/media/1000515049 text_length=249
+05-20 11:46:05.947 I/ProcessingTime(25726): step_language_identification duration_ms=3 start_ms=1779252365944 end_ms=1779252365947 uri=content://media/external/images/media/1000515049 text_length=249
+05-20 11:46:06.676 I/ProcessingTime(25726): step_translate_to_en duration_ms=728 start_ms=1779252365948 end_ms=1779252366676 uri=content://media/external/images/media/1000515049 source_language=vi text_length=249
+05-20 11:46:06.789 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=111 start_ms=1779252366677 end_ms=1779252366788 uri=content://media/external/images/media/1000515049 text_length=246
+05-20 11:46:06.789 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1255 start_ms=1779252365534 end_ms=1779252366789 uri=content://media/external/images/media/1000515049
+05-20 11:46:06.799 I/ProcessingTime(25726): step_objectbox_put duration_ms=7 start_ms=1779252366792 end_ms=1779252366799 uri=content://media/external/images/media/1000515049
+05-20 11:46:06.836 I/ProcessingTime(25726): step_assign_collections duration_ms=37 start_ms=1779252366799 end_ms=1779252366836 uri=content://media/external/images/media/1000515049 labels=3
+05-20 11:46:06.836 I/ProcessingTime(25726): image_processor_total duration_ms=1322 start_ms=1779252365514 end_ms=1779252366836 uri=content://media/external/images/media/1000515049 mode=parallel
+05-20 11:46:06.837 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1414 start_ms=1779252365423 end_ms=1779252366837 uri=content://media/external/images/media/1000515049 mode=parallel
+05-20 11:46:06.838 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1414 start_ms=1779252365423 end_ms=1779252366837 uri=content://media/external/images/media/1000515049
+05-20 11:46:10.930 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252370929 uri=content://media/external/images/media/1000515050
+05-20 11:46:11.047 I/ProcessingTime(25726): step_media_store_read duration_ms=18 start_ms=1779252371029 end_ms=1779252371047 uri=content://media/external/images/media/1000515050
+05-20 11:46:11.098 I/ProcessingTime(25726): step_image_description duration_ms=47 start_ms=1779252371050 end_ms=1779252371097 uri=content://media/external/images/media/1000515050
+05-20 11:46:11.249 I/ProcessingTime(25726): step_image_labeling duration_ms=151 start_ms=1779252371098 end_ms=1779252371249 uri=content://media/external/images/media/1000515050
+05-20 11:46:11.366 I/ProcessingTime(25726): step_embed_description_text duration_ms=115 start_ms=1779252371250 end_ms=1779252371365 uri=content://media/external/images/media/1000515050 text_length=42
+05-20 11:46:11.366 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=316 start_ms=1779252371050 end_ms=1779252371366 uri=content://media/external/images/media/1000515050
+05-20 11:46:11.436 I/ProcessingTime(25726): step_ocr duration_ms=386 start_ms=1779252371049 end_ms=1779252371435 uri=content://media/external/images/media/1000515050
+05-20 11:46:11.468 I/ProcessingTime(25726): step_text_classifier duration_ms=31 start_ms=1779252371436 end_ms=1779252371467 uri=content://media/external/images/media/1000515050 text_length=249
+05-20 11:46:11.472 I/ProcessingTime(25726): step_language_identification duration_ms=4 start_ms=1779252371468 end_ms=1779252371472 uri=content://media/external/images/media/1000515050 text_length=249
+05-20 11:46:12.178 I/ProcessingTime(25726): step_translate_to_en duration_ms=705 start_ms=1779252371473 end_ms=1779252372178 uri=content://media/external/images/media/1000515050 source_language=vi text_length=249
+05-20 11:46:12.280 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=101 start_ms=1779252372178 end_ms=1779252372279 uri=content://media/external/images/media/1000515050 text_length=246
+05-20 11:46:12.280 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1231 start_ms=1779252371049 end_ms=1779252372280 uri=content://media/external/images/media/1000515050
+05-20 11:46:12.288 I/ProcessingTime(25726): step_objectbox_put duration_ms=7 start_ms=1779252372281 end_ms=1779252372288 uri=content://media/external/images/media/1000515050
+05-20 11:46:12.329 I/ProcessingTime(25726): step_assign_collections duration_ms=40 start_ms=1779252372289 end_ms=1779252372329 uri=content://media/external/images/media/1000515050 labels=3
+05-20 11:46:12.329 I/ProcessingTime(25726): image_processor_total duration_ms=1300 start_ms=1779252371029 end_ms=1779252372329 uri=content://media/external/images/media/1000515050 mode=parallel
+05-20 11:46:12.329 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1400 start_ms=1779252370929 end_ms=1779252372329 uri=content://media/external/images/media/1000515050 mode=parallel
+05-20 11:46:12.331 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1402 start_ms=1779252370929 end_ms=1779252372331 uri=content://media/external/images/media/1000515050
+05-20 11:46:16.645 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252376643 uri=content://media/external/images/media/1000515051
+05-20 11:46:16.744 I/ProcessingTime(25726): step_media_store_read duration_ms=11 start_ms=1779252376733 end_ms=1779252376744 uri=content://media/external/images/media/1000515051
+05-20 11:46:16.788 I/ProcessingTime(25726): step_image_description duration_ms=43 start_ms=1779252376745 end_ms=1779252376788 uri=content://media/external/images/media/1000515051
+05-20 11:46:16.958 I/ProcessingTime(25726): step_image_labeling duration_ms=170 start_ms=1779252376788 end_ms=1779252376958 uri=content://media/external/images/media/1000515051
+05-20 11:46:17.080 I/ProcessingTime(25726): step_embed_description_text duration_ms=120 start_ms=1779252376959 end_ms=1779252377079 uri=content://media/external/images/media/1000515051 text_length=42
+05-20 11:46:17.080 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=335 start_ms=1779252376745 end_ms=1779252377080 uri=content://media/external/images/media/1000515051
+05-20 11:46:17.158 I/ProcessingTime(25726): step_ocr duration_ms=412 start_ms=1779252376745 end_ms=1779252377157 uri=content://media/external/images/media/1000515051
+05-20 11:46:17.188 I/ProcessingTime(25726): step_text_classifier duration_ms=30 start_ms=1779252377158 end_ms=1779252377188 uri=content://media/external/images/media/1000515051 text_length=249
+05-20 11:46:17.192 I/ProcessingTime(25726): step_language_identification duration_ms=3 start_ms=1779252377189 end_ms=1779252377192 uri=content://media/external/images/media/1000515051 text_length=249
+05-20 11:46:17.941 I/ProcessingTime(25726): step_translate_to_en duration_ms=749 start_ms=1779252377192 end_ms=1779252377941 uri=content://media/external/images/media/1000515051 source_language=vi text_length=249
+05-20 11:46:18.040 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=99 start_ms=1779252377941 end_ms=1779252378040 uri=content://media/external/images/media/1000515051 text_length=246
+05-20 11:46:18.041 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1296 start_ms=1779252376745 end_ms=1779252378041 uri=content://media/external/images/media/1000515051
+05-20 11:46:18.052 I/ProcessingTime(25726): step_objectbox_put duration_ms=8 start_ms=1779252378044 end_ms=1779252378052 uri=content://media/external/images/media/1000515051
+05-20 11:46:18.096 I/ProcessingTime(25726): step_assign_collections duration_ms=44 start_ms=1779252378052 end_ms=1779252378096 uri=content://media/external/images/media/1000515051 labels=3
+05-20 11:46:18.096 I/ProcessingTime(25726): image_processor_total duration_ms=1363 start_ms=1779252376733 end_ms=1779252378096 uri=content://media/external/images/media/1000515051 mode=parallel
+05-20 11:46:18.097 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1453 start_ms=1779252376643 end_ms=1779252378096 uri=content://media/external/images/media/1000515051 mode=parallel
+05-20 11:46:18.098 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1455 start_ms=1779252376643 end_ms=1779252378098 uri=content://media/external/images/media/1000515051
+05-20 11:46:22.298 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252382296 uri=content://media/external/images/media/1000515052
+05-20 11:46:22.409 I/ProcessingTime(25726): step_media_store_read duration_ms=14 start_ms=1779252382395 end_ms=1779252382409 uri=content://media/external/images/media/1000515052
+05-20 11:46:22.453 I/ProcessingTime(25726): step_image_description duration_ms=42 start_ms=1779252382411 end_ms=1779252382453 uri=content://media/external/images/media/1000515052
+05-20 11:46:22.596 I/ProcessingTime(25726): step_image_labeling duration_ms=143 start_ms=1779252382453 end_ms=1779252382596 uri=content://media/external/images/media/1000515052
+05-20 11:46:22.696 I/ProcessingTime(25726): step_embed_description_text duration_ms=99 start_ms=1779252382596 end_ms=1779252382695 uri=content://media/external/images/media/1000515052 text_length=42
+05-20 11:46:22.696 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=285 start_ms=1779252382411 end_ms=1779252382696 uri=content://media/external/images/media/1000515052
+05-20 11:46:22.765 I/ProcessingTime(25726): step_ocr duration_ms=355 start_ms=1779252382410 end_ms=1779252382765 uri=content://media/external/images/media/1000515052
+05-20 11:46:22.793 I/ProcessingTime(25726): step_text_classifier duration_ms=28 start_ms=1779252382765 end_ms=1779252382793 uri=content://media/external/images/media/1000515052 text_length=249
+05-20 11:46:22.796 I/ProcessingTime(25726): step_language_identification duration_ms=3 start_ms=1779252382793 end_ms=1779252382796 uri=content://media/external/images/media/1000515052 text_length=249
+05-20 11:46:23.503 I/ProcessingTime(25726): step_translate_to_en duration_ms=705 start_ms=1779252382797 end_ms=1779252383502 uri=content://media/external/images/media/1000515052 source_language=vi text_length=249
+05-20 11:46:23.603 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=100 start_ms=1779252383503 end_ms=1779252383603 uri=content://media/external/images/media/1000515052 text_length=246
+05-20 11:46:23.604 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1194 start_ms=1779252382410 end_ms=1779252383604 uri=content://media/external/images/media/1000515052
+05-20 11:46:23.615 I/ProcessingTime(25726): step_objectbox_put duration_ms=8 start_ms=1779252383607 end_ms=1779252383615 uri=content://media/external/images/media/1000515052
+05-20 11:46:23.657 I/ProcessingTime(25726): step_assign_collections duration_ms=41 start_ms=1779252383616 end_ms=1779252383657 uri=content://media/external/images/media/1000515052 labels=3
+05-20 11:46:23.657 I/ProcessingTime(25726): image_processor_total duration_ms=1263 start_ms=1779252382394 end_ms=1779252383657 uri=content://media/external/images/media/1000515052 mode=parallel
+05-20 11:46:23.657 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1361 start_ms=1779252382296 end_ms=1779252383657 uri=content://media/external/images/media/1000515052 mode=parallel
+05-20 11:46:23.658 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1362 start_ms=1779252382296 end_ms=1779252383658 uri=content://media/external/images/media/1000515052
+05-20 11:46:32.513 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252392511 uri=content://media/external/images/media/1000515053
+05-20 11:46:32.618 I/ProcessingTime(25726): step_media_store_read duration_ms=15 start_ms=1779252392603 end_ms=1779252392618 uri=content://media/external/images/media/1000515053
+05-20 11:46:32.661 I/ProcessingTime(25726): step_image_description duration_ms=40 start_ms=1779252392620 end_ms=1779252392660 uri=content://media/external/images/media/1000515053
+05-20 11:46:32.810 I/ProcessingTime(25726): step_image_labeling duration_ms=149 start_ms=1779252392661 end_ms=1779252392810 uri=content://media/external/images/media/1000515053
+05-20 11:46:32.930 I/ProcessingTime(25726): step_embed_description_text duration_ms=119 start_ms=1779252392811 end_ms=1779252392930 uri=content://media/external/images/media/1000515053 text_length=42
+05-20 11:46:32.931 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=312 start_ms=1779252392619 end_ms=1779252392931 uri=content://media/external/images/media/1000515053
+05-20 11:46:32.979 I/ProcessingTime(25726): step_ocr duration_ms=359 start_ms=1779252392619 end_ms=1779252392978 uri=content://media/external/images/media/1000515053
+05-20 11:46:33.010 I/ProcessingTime(25726): step_text_classifier duration_ms=31 start_ms=1779252392979 end_ms=1779252393010 uri=content://media/external/images/media/1000515053 text_length=249
+05-20 11:46:33.014 I/ProcessingTime(25726): step_language_identification duration_ms=4 start_ms=1779252393010 end_ms=1779252393014 uri=content://media/external/images/media/1000515053 text_length=249
+05-20 11:46:33.725 I/ProcessingTime(25726): step_translate_to_en duration_ms=711 start_ms=1779252393014 end_ms=1779252393725 uri=content://media/external/images/media/1000515053 source_language=vi text_length=249
+05-20 11:46:33.827 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=101 start_ms=1779252393726 end_ms=1779252393827 uri=content://media/external/images/media/1000515053 text_length=246
+05-20 11:46:33.828 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1208 start_ms=1779252392619 end_ms=1779252393827 uri=content://media/external/images/media/1000515053
+05-20 11:46:33.838 I/ProcessingTime(25726): step_objectbox_put duration_ms=7 start_ms=1779252393831 end_ms=1779252393838 uri=content://media/external/images/media/1000515053
+05-20 11:46:33.882 I/ProcessingTime(25726): step_assign_collections duration_ms=43 start_ms=1779252393838 end_ms=1779252393881 uri=content://media/external/images/media/1000515053 labels=3
+05-20 11:46:33.882 I/ProcessingTime(25726): image_processor_total duration_ms=1279 start_ms=1779252392603 end_ms=1779252393882 uri=content://media/external/images/media/1000515053 mode=parallel
+05-20 11:46:33.882 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1371 start_ms=1779252392511 end_ms=1779252393882 uri=content://media/external/images/media/1000515053 mode=parallel
+05-20 11:46:33.883 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1372 start_ms=1779252392511 end_ms=1779252393883 uri=content://media/external/images/media/1000515053
+05-20 11:46:39.722 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252399719 uri=content://media/external/images/media/1000515054
+05-20 11:46:39.842 I/ProcessingTime(25726): step_media_store_read duration_ms=19 start_ms=1779252399823 end_ms=1779252399842 uri=content://media/external/images/media/1000515054
+05-20 11:46:39.887 I/ProcessingTime(25726): step_image_description duration_ms=42 start_ms=1779252399845 end_ms=1779252399887 uri=content://media/external/images/media/1000515054
+05-20 11:46:40.028 I/ProcessingTime(25726): step_image_labeling duration_ms=141 start_ms=1779252399887 end_ms=1779252400028 uri=content://media/external/images/media/1000515054
+05-20 11:46:40.131 I/ProcessingTime(25726): step_embed_description_text duration_ms=102 start_ms=1779252400029 end_ms=1779252400131 uri=content://media/external/images/media/1000515054 text_length=42
+05-20 11:46:40.131 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=286 start_ms=1779252399845 end_ms=1779252400131 uri=content://media/external/images/media/1000515054
+05-20 11:46:40.197 I/ProcessingTime(25726): step_ocr duration_ms=353 start_ms=1779252399844 end_ms=1779252400197 uri=content://media/external/images/media/1000515054
+05-20 11:46:40.222 I/ProcessingTime(25726): step_text_classifier duration_ms=24 start_ms=1779252400197 end_ms=1779252400221 uri=content://media/external/images/media/1000515054 text_length=249
+05-20 11:46:40.225 I/ProcessingTime(25726): step_language_identification duration_ms=3 start_ms=1779252400222 end_ms=1779252400225 uri=content://media/external/images/media/1000515054 text_length=249
+05-20 11:46:40.941 I/ProcessingTime(25726): step_translate_to_en duration_ms=715 start_ms=1779252400226 end_ms=1779252400941 uri=content://media/external/images/media/1000515054 source_language=vi text_length=249
+05-20 11:46:41.041 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=100 start_ms=1779252400941 end_ms=1779252401041 uri=content://media/external/images/media/1000515054 text_length=246
+05-20 11:46:41.042 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1198 start_ms=1779252399844 end_ms=1779252401042 uri=content://media/external/images/media/1000515054
+05-20 11:46:41.053 I/ProcessingTime(25726): step_objectbox_put duration_ms=8 start_ms=1779252401045 end_ms=1779252401053 uri=content://media/external/images/media/1000515054
+05-20 11:46:41.097 I/ProcessingTime(25726): step_assign_collections duration_ms=43 start_ms=1779252401054 end_ms=1779252401097 uri=content://media/external/images/media/1000515054 labels=3
+05-20 11:46:41.098 I/ProcessingTime(25726): image_processor_total duration_ms=1274 start_ms=1779252399823 end_ms=1779252401097 uri=content://media/external/images/media/1000515054 mode=parallel
+05-20 11:46:41.098 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1379 start_ms=1779252399719 end_ms=1779252401098 uri=content://media/external/images/media/1000515054 mode=parallel
+05-20 11:46:41.099 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1379 start_ms=1779252399719 end_ms=1779252401098 uri=content://media/external/images/media/1000515054
+05-20 11:46:45.189 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252405187 uri=content://media/external/images/media/1000515055
+05-20 11:46:45.282 I/ProcessingTime(25726): step_media_store_read duration_ms=14 start_ms=1779252405268 end_ms=1779252405282 uri=content://media/external/images/media/1000515055
+05-20 11:46:45.327 I/ProcessingTime(25726): step_image_description duration_ms=42 start_ms=1779252405285 end_ms=1779252405327 uri=content://media/external/images/media/1000515055
+05-20 11:46:45.477 I/ProcessingTime(25726): step_image_labeling duration_ms=149 start_ms=1779252405328 end_ms=1779252405477 uri=content://media/external/images/media/1000515055
+05-20 11:46:45.595 I/ProcessingTime(25726): step_embed_description_text duration_ms=117 start_ms=1779252405478 end_ms=1779252405595 uri=content://media/external/images/media/1000515055 text_length=42
+05-20 11:46:45.595 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=310 start_ms=1779252405285 end_ms=1779252405595 uri=content://media/external/images/media/1000515055
+05-20 11:46:45.658 I/ProcessingTime(25726): step_ocr duration_ms=374 start_ms=1779252405284 end_ms=1779252405658 uri=content://media/external/images/media/1000515055
+05-20 11:46:45.689 I/ProcessingTime(25726): step_text_classifier duration_ms=30 start_ms=1779252405659 end_ms=1779252405689 uri=content://media/external/images/media/1000515055 text_length=249
+05-20 11:46:45.692 I/ProcessingTime(25726): step_language_identification duration_ms=2 start_ms=1779252405690 end_ms=1779252405692 uri=content://media/external/images/media/1000515055 text_length=249
+05-20 11:46:46.421 I/ProcessingTime(25726): step_translate_to_en duration_ms=728 start_ms=1779252405692 end_ms=1779252406420 uri=content://media/external/images/media/1000515055 source_language=vi text_length=249
+05-20 11:46:46.520 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=99 start_ms=1779252406421 end_ms=1779252406520 uri=content://media/external/images/media/1000515055 text_length=246
+05-20 11:46:46.521 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1236 start_ms=1779252405284 end_ms=1779252406520 uri=content://media/external/images/media/1000515055
+05-20 11:46:46.531 I/ProcessingTime(25726): step_objectbox_put duration_ms=7 start_ms=1779252406524 end_ms=1779252406531 uri=content://media/external/images/media/1000515055
+05-20 11:46:46.576 I/ProcessingTime(25726): step_assign_collections duration_ms=45 start_ms=1779252406531 end_ms=1779252406576 uri=content://media/external/images/media/1000515055 labels=3
+05-20 11:46:46.576 I/ProcessingTime(25726): image_processor_total duration_ms=1308 start_ms=1779252405268 end_ms=1779252406576 uri=content://media/external/images/media/1000515055 mode=parallel
+05-20 11:46:46.576 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1389 start_ms=1779252405187 end_ms=1779252406576 uri=content://media/external/images/media/1000515055 mode=parallel
+05-20 11:46:46.577 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1390 start_ms=1779252405187 end_ms=1779252406577 uri=content://media/external/images/media/1000515055
+05-20 11:46:50.883 I/ProcessingTime(25726): schedule_scan_worker start_ms=1779252410880 uri=content://media/external/images/media/1000515056
+05-20 11:46:51.018 I/ProcessingTime(25726): step_media_store_read duration_ms=17 start_ms=1779252411001 end_ms=1779252411018 uri=content://media/external/images/media/1000515056
+05-20 11:46:51.052 I/ProcessingTime(25726): step_image_description duration_ms=32 start_ms=1779252411020 end_ms=1779252411052 uri=content://media/external/images/media/1000515056
+05-20 11:46:51.209 I/ProcessingTime(25726): step_image_labeling duration_ms=157 start_ms=1779252411052 end_ms=1779252411209 uri=content://media/external/images/media/1000515056
+05-20 11:46:51.321 I/ProcessingTime(25726): step_embed_description_text duration_ms=112 start_ms=1779252411209 end_ms=1779252411321 uri=content://media/external/images/media/1000515056 text_length=42
+05-20 11:46:51.321 I/ProcessingTime(25726): branch_image_semantic_pipeline duration_ms=301 start_ms=1779252411020 end_ms=1779252411321 uri=content://media/external/images/media/1000515056
+05-20 11:46:51.397 I/ProcessingTime(25726): step_ocr duration_ms=378 start_ms=1779252411019 end_ms=1779252411397 uri=content://media/external/images/media/1000515056
+05-20 11:46:51.426 I/ProcessingTime(25726): step_text_classifier duration_ms=29 start_ms=1779252411397 end_ms=1779252411426 uri=content://media/external/images/media/1000515056 text_length=249
+05-20 11:46:51.431 I/ProcessingTime(25726): step_language_identification duration_ms=3 start_ms=1779252411427 end_ms=1779252411430 uri=content://media/external/images/media/1000515056 text_length=249
+05-20 11:46:52.101 I/ProcessingTime(25726): step_translate_to_en duration_ms=670 start_ms=1779252411431 end_ms=1779252412101 uri=content://media/external/images/media/1000515056 source_language=vi text_length=249
+05-20 11:46:52.196 I/ProcessingTime(25726): step_embed_ocr_text duration_ms=95 start_ms=1779252412101 end_ms=1779252412196 uri=content://media/external/images/media/1000515056 text_length=246
+05-20 11:46:52.196 I/ProcessingTime(25726): branch_ocr_text_pipeline duration_ms=1177 start_ms=1779252411019 end_ms=1779252412196 uri=content://media/external/images/media/1000515056
+05-20 11:46:52.200 I/ProcessingTime(25726): step_objectbox_put duration_ms=3 start_ms=1779252412197 end_ms=1779252412200 uri=content://media/external/images/media/1000515056
+05-20 11:46:52.219 I/ProcessingTime(25726): step_assign_collections duration_ms=19 start_ms=1779252412200 end_ms=1779252412219 uri=content://media/external/images/media/1000515056 labels=3
+05-20 11:46:52.219 I/ProcessingTime(25726): image_processor_total duration_ms=1218 start_ms=1779252411001 end_ms=1779252412219 uri=content://media/external/images/media/1000515056 mode=parallel
+05-20 11:46:52.219 I/ProcessingTime(25726): pipeline_total_until_process_end duration_ms=1339 start_ms=1779252410880 end_ms=1779252412219 uri=content://media/external/images/media/1000515056 mode=parallel
+05-20 11:46:52.219 I/ProcessingTime(25726): pipeline_until_worker_notify duration_ms=1339 start_ms=1779252410880 end_ms=1779252412219 uri=content://media/external/images/media/1000515056
+05-20 11:46:55.575 I/ResponseLatency(25726): open_image_detail duration_ms=357 start_ms=1779252415218 end_ms=1779252415575 uri=content://media/external/images/media/1000515031 position=25
+05-20 11:46:56.551 I/ResponseLatency(25726): detail_metadata_open duration_ms=206 start_ms=1779252416345 end_ms=1779252416551 uri=content://media/external/images/media/1000515031
+05-20 11:47:01.226 I/ResponseLatency(25726): open_image_detail duration_ms=388 start_ms=1779252420838 end_ms=1779252421226 uri=content://media/external/images/media/1000515052 position=4
+05-20 11:47:01.861 I/ResponseLatency(25726): detail_metadata_open duration_ms=100 start_ms=1779252421761 end_ms=1779252421861 uri=content://media/external/images/media/1000515052
+05-20 11:47:04.462 I/ResponseLatency(25726): open_image_detail duration_ms=383 start_ms=1779252424079 end_ms=1779252424462 uri=content://media/external/images/media/1000515054 position=2
+05-20 11:47:06.090 I/ResponseLatency(25726): detail_metadata_open duration_ms=91 start_ms=1779252425999 end_ms=1779252426090 uri=content://media/external/images/media/1000515055
+05-20 11:47:08.828 I/ResponseLatency(25726): open_image_detail duration_ms=342 start_ms=1779252428486 end_ms=1779252428828 uri=content://media/external/images/media/1000515053 position=3
+05-20 11:47:09.514 I/ResponseLatency(25726): detail_metadata_open duration_ms=97 start_ms=1779252429417 end_ms=1779252429514 uri=content://media/external/images/media/1000515053
+05-20 11:47:12.243 I/ResponseLatency(25726): open_image_detail duration_ms=448 start_ms=1779252431794 end_ms=1779252432242 uri=content://media/external/images/media/1000515048 position=8
+05-20 11:47:12.950 I/ResponseLatency(25726): detail_metadata_open duration_ms=105 start_ms=1779252432845 end_ms=1779252432950 uri=content://media/external/images/media/1000515048
+05-20 11:53:47.625 I/ResponseLatency(25726): search_response duration_ms=830 start_ms=1779252826795 end_ms=1779252827625 query_length=1 total_results=1
+05-20 11:53:49.724 I/ResponseLatency(25726): search_response duration_ms=832 start_ms=1779252828892 end_ms=1779252829724 query_length=4 total_results=50
+05-20 11:53:51.735 I/ResponseLatency(25726): search_response duration_ms=759 start_ms=1779252830976 end_ms=1779252831735 query_length=1 total_results=1
+05-20 11:53:53.328 I/ResponseLatency(25726): search_response duration_ms=809 start_ms=1779252832519 end_ms=1779252833328 query_length=3 total_results=11
+05-20 11:53:55.824 I/ResponseLatency(25726): search_response duration_ms=718 start_ms=1779252835106 end_ms=1779252835824 query_length=3 total_results=1
+05-20 11:53:59.277 I/ResponseLatency(25726): search_response duration_ms=852 start_ms=1779252838425 end_ms=1779252839277 query_length=3 total_results=11
+05-20 11:53:59.873 I/ResponseLatency(25726): search_response duration_ms=869 start_ms=1779252839004 end_ms=1779252839873 query_length=4 total_results=51
+05-20 11:54:03.393 I/ResponseLatency(25726): search_response duration_ms=908 start_ms=1779252842485 end_ms=1779252843393 query_length=8 total_results=2
+05-20 12:08:17.888 I/StartupTime(28892): init_objectbox duration_ms=118 start_ms=1779253697770 end_ms=1779253697888
+05-20 12:08:17.888 I/StartupTime(28892): init_media_repository duration_ms=0 start_ms=1779253697888 end_ms=1779253697888
+05-20 12:08:17.890 I/StartupTime(28892): init_ocr_service duration_ms=2 start_ms=1779253697888 end_ms=1779253697890
+05-20 12:08:18.054 I/StartupTime(28892): init_text_embedder duration_ms=164 start_ms=1779253697890 end_ms=1779253698054
+05-20 12:08:18.065 I/StartupTime(28892): init_translate_service duration_ms=11 start_ms=1779253698054 end_ms=1779253698065
+05-20 12:08:18.085 I/StartupTime(28892): init_text_classifier duration_ms=20 start_ms=1779253698065 end_ms=1779253698085
+05-20 12:08:18.118 I/StartupTime(28892): init_object_extraction duration_ms=33 start_ms=1779253698085 end_ms=1779253698118
+05-20 12:08:18.169 I/StartupTime(28892): init_image_description duration_ms=51 start_ms=1779253698118 end_ms=1779253698169
+05-20 12:08:18.171 I/StartupTime(28892): init_speech_recognition duration_ms=2 start_ms=1779253698169 end_ms=1779253698171
+05-20 12:08:19.075 I/StartupTime(28892): app_open_response duration_ms=1674 start_ms=1779253697401 end_ms=1779253699075 condition=activity_create critical_init=objectbox_text_embedder initial_screen=rendered
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         05-20 12:10:43.336 I/ProcessingTime(28892): step_media_store_read duration_ms=25 start_ms=1779253843311 end_ms=1779253843336 uri=content://media/external
+05-20 12:10:43.345 I/ProcessingTime(28892): step_image_description duration_ms=3 start_ms=1779253843342 end_ms=1779253843345 uri=content://media/external
+05-20 12:10:43.346 I/ProcessingTime(28892): branch_image_semantic_pipeline duration_ms=3 start_ms=1779253843342 end_ms=1779253843345 uri=content://media/external
+05-20 12:10:43.346 I/ProcessingTime(28892): step_ocr duration_ms=4 start_ms=1779253843342 end_ms=1779253843346 uri=content://media/external
+05-20 12:10:43.346 I/ProcessingTime(28892): branch_ocr_text_pipeline duration_ms=4 start_ms=1779253843342 end_ms=1779253843346 uri=content://media/external
+05-20 12:10:43.350 I/ProcessingTime(28892): image_processor_total duration_ms=40 start_ms=1779253843310 end_ms=1779253843350 uri=content://media/external mode=parallel
+05-20 12:10:43.350 I/ProcessingTime(28892): pipeline_total_until_process_end duration_ms=52 start_ms=1779253843298 end_ms=1779253843350 uri=content://media/external mode=parallel
+05-20 12:36:47.859 I/StartupTime(28892): app_open_response duration_ms=403 start_ms=1779255407456 end_ms=1779255407859 condition=foreground_reopen initial_screen=rendered
+05-20 12:37:04.745 I/StartupTime(28892): app_open_response duration_ms=149 start_ms=1779255424596 end_ms=1779255424745 condition=foreground_reopen initial_screen=rendered
+05-20 12:37:13.956 I/StartupTime(29589): process_start start_ms=1779255433956
+05-20 12:37:14.502 I/StartupTime(29589): init_objectbox duration_ms=118 start_ms=1779255434384 end_ms=1779255434502
+05-20 12:37:14.503 I/StartupTime(29589): init_media_repository duration_ms=1 start_ms=1779255434502 end_ms=1779255434503
+05-20 12:37:14.504 I/StartupTime(29589): init_ocr_service duration_ms=1 start_ms=1779255434503 end_ms=1779255434504
+05-20 12:37:14.669 I/StartupTime(29589): init_text_embedder duration_ms=165 start_ms=1779255434504 end_ms=1779255434669
+05-20 12:37:14.680 I/StartupTime(29589): init_translate_service duration_ms=11 start_ms=1779255434669 end_ms=1779255434680
+05-20 12:37:14.693 I/StartupTime(29589): init_text_classifier duration_ms=13 start_ms=1779255434680 end_ms=1779255434693
+05-20 12:37:14.730 I/StartupTime(29589): init_object_extraction duration_ms=37 start_ms=1779255434693 end_ms=1779255434730
+05-20 12:37:14.781 I/StartupTime(29589): init_image_description duration_ms=50 start_ms=1779255434731 end_ms=1779255434781
+05-20 12:37:14.783 I/StartupTime(29589): init_speech_recognition duration_ms=1 start_ms=1779255434782 end_ms=1779255434783
+05-20 12:37:15.643 I/StartupTime(29589): app_open_response duration_ms=1569 start_ms=1779255434074 end_ms=1779255435643 condition=activity_create critical_init=objectbox_text_embedder initial_screen=rendered
+05-20 12:37:28.009 I/StartupTime(29740): process_start start_ms=1779255448009
+05-20 12:37:28.557 I/StartupTime(29740): init_objectbox duration_ms=117 start_ms=1779255448440 end_ms=1779255448557
+05-20 12:37:28.557 I/StartupTime(29740): init_media_repository duration_ms=0 start_ms=1779255448557 end_ms=1779255448557
+05-20 12:37:28.559 I/StartupTime(29740): init_ocr_service duration_ms=2 start_ms=1779255448557 end_ms=1779255448559
+05-20 12:37:28.725 I/StartupTime(29740): init_text_embedder duration_ms=166 start_ms=1779255448559 end_ms=1779255448725
+05-20 12:37:28.736 I/StartupTime(29740): init_translate_service duration_ms=11 start_ms=1779255448725 end_ms=1779255448736
+05-20 12:37:28.748 I/StartupTime(29740): init_text_classifier duration_ms=12 start_ms=1779255448736 end_ms=1779255448748
+05-20 12:37:28.777 I/StartupTime(29740): init_object_extraction duration_ms=29 start_ms=1779255448748 end_ms=1779255448777
+05-20 12:37:28.819 I/StartupTime(29740): init_image_description duration_ms=41 start_ms=1779255448778 end_ms=1779255448819
+05-20 12:37:28.820 I/StartupTime(29740): init_speech_recognition duration_ms=1 start_ms=1779255448819 end_ms=1779255448820
+05-20 12:37:29.667 I/StartupTime(29740): app_open_response duration_ms=1536 start_ms=1779255448130 end_ms=1779255449666 condition=activity_create critical_init=objectbox_text_embedder initial_screen=rendered
+05-20 12:37:44.200 I/StartupTime(29881): process_start start_ms=1779255464200
+05-20 12:37:44.742 I/StartupTime(29881): init_objectbox duration_ms=118 start_ms=1779255464624 end_ms=1779255464742
+05-20 12:37:44.743 I/StartupTime(29881): init_media_repository duration_ms=1 start_ms=1779255464742 end_ms=1779255464743
+05-20 12:37:44.744 I/StartupTime(29881): init_ocr_service duration_ms=1 start_ms=1779255464743 end_ms=1779255464744
+05-20 12:37:44.910 I/StartupTime(29881): init_text_embedder duration_ms=166 start_ms=1779255464744 end_ms=1779255464910
+05-20 12:37:44.925 I/StartupTime(29881): init_translate_service duration_ms=15 start_ms=1779255464910 end_ms=1779255464925
+05-20 12:37:44.941 I/StartupTime(29881): init_text_classifier duration_ms=16 start_ms=1779255464925 end_ms=1779255464941
+05-20 12:37:44.972 I/StartupTime(29881): init_object_extraction duration_ms=31 start_ms=1779255464941 end_ms=1779255464972
+05-20 12:37:45.017 I/StartupTime(29881): init_image_description duration_ms=44 start_ms=1779255464973 end_ms=1779255465017
+05-20 12:37:45.018 I/StartupTime(29881): init_speech_recognition duration_ms=1 start_ms=1779255465017 end_ms=1779255465018
+05-20 12:37:45.835 I/StartupTime(29881): app_open_response duration_ms=1504 start_ms=1779255464331 end_ms=1779255465835 condition=activity_create critical_init=objectbox_text_embedder initial_screen=rendered
+05-20 12:37:52.689 I/StartupTime(30024): process_start start_ms=1779255472689
+05-20 12:37:53.233 I/StartupTime(30024): init_objectbox duration_ms=117 start_ms=1779255473116 end_ms=1779255473233
+05-20 12:37:53.234 I/StartupTime(30024): init_media_repository duration_ms=0 start_ms=1779255473233 end_ms=1779255473233
+05-20 12:37:53.235 I/StartupTime(30024): init_ocr_service duration_ms=1 start_ms=1779255473234 end_ms=1779255473235
+05-20 12:37:53.399 I/StartupTime(30024): init_text_embedder duration_ms=164 start_ms=1779255473235 end_ms=1779255473399
+05-20 12:37:53.413 I/StartupTime(30024): init_translate_service duration_ms=13 start_ms=1779255473400 end_ms=1779255473413
+05-20 12:37:53.432 I/StartupTime(30024): init_text_classifier duration_ms=19 start_ms=1779255473413 end_ms=1779255473432
+05-20 12:37:53.469 I/StartupTime(30024): init_object_extraction duration_ms=37 start_ms=1779255473432 end_ms=1779255473469
+05-20 12:37:53.511 I/StartupTime(30024): init_image_description duration_ms=42 start_ms=1779255473469 end_ms=1779255473511
+05-20 12:37:53.512 I/StartupTime(30024): init_speech_recognition duration_ms=1 start_ms=1779255473511 end_ms=1779255473512
+05-20 12:37:54.362 I/StartupTime(30024): app_open_response duration_ms=1553 start_ms=1779255472809 end_ms=1779255474362 condition=activity_create critical_init=objectbox_text_embedder initial_screen=rendered

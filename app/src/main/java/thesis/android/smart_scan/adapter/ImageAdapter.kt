@@ -38,7 +38,11 @@ class ImageAdapter(
         }
     }
 
-    fun resetItems(uris: List<Uri>) = submitList(uris)
+    fun resetItems(uris: List<Uri>, onCommitted: (() -> Unit)? = null) {
+        submitList(uris) {
+            onCommitted?.invoke()
+        }
+    }
 
     fun appendItems(newUris: List<Uri>) {
         if (newUris.isEmpty()) return

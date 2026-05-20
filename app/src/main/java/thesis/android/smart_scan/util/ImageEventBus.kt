@@ -1,14 +1,20 @@
 package thesis.android.smart_scan.util
 
+import android.net.Uri
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-object ImageEventBus {
-    private val _newImageFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 16)
-    val newImageFlow: SharedFlow<Unit> = _newImageFlow.asSharedFlow()
+data class NewImageEvent(
+    val uri: Uri,
+    val processingStartedAtMs: Long
+)
 
-    fun notifyNewImage() {
-        _newImageFlow.tryEmit(Unit)
+object ImageEventBus {
+    private val _newImageFlow = MutableSharedFlow<NewImageEvent>(extraBufferCapacity = 16)
+    val newImageFlow: SharedFlow<NewImageEvent> = _newImageFlow.asSharedFlow()
+
+    fun notifyNewImage(uri: Uri, processingStartedAtMs: Long) {
+        _newImageFlow.tryEmit(NewImageEvent(uri, processingStartedAtMs))
     }
 }
